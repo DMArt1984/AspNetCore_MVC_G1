@@ -22,5 +22,6 @@ namespace AspNetCore_MVC_Project.Data
 
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
+        public DbSet<Mark> Marks { get; set; } // Новая таблица Mark
     }
 }

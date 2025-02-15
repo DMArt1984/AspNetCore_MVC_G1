@@ -137,6 +137,22 @@ namespace AspNetCore_MVC_Project.Controllers
             _context.Companies.Add(company);
             await _context.SaveChangesAsync();
 
+            // Создание базы данных компании
+            var dbContext = await GetCompanyDbContext(company.Id);
+            if (dbContext == null)
+                return BadRequest(new { message = "Ошибка при создании базы компании." });
+
+            dbContext.Database.EnsureCreated(); // Создаём базу
+
+            // Добавляем записи в таблицу Mark
+            var user = await _userManager.GetUserAsync(User);
+            var creatorName = user != null ? user.UserName : "Unknown";
+
+            dbContext.Marks.Add(new Mark { Title = "Creator", Value = creatorName });
+            dbContext.Marks.Add(new Mark { Title = "Service", Value = "0" });
+
+            await dbContext.SaveChangesAsync(); // Сохраняем изменения
+
             return CreatedAtAction(nameof(GetCompanies), new { id = company.Id }, company);
         }
 

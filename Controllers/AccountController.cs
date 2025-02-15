@@ -6,6 +6,7 @@ using AspNetCore_MVC_Project.ViewModels;
 using AspNetCore_MVC_Project.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
@@ -40,6 +41,22 @@ namespace AspNetCore_MVC_Project.Controllers
             _context = context;
             _logger = logger;
         }
+
+        /// <summary>
+        /// Получает контекст базы данных компании.
+        /// </summary>
+        /// <param name="companyId">Идентификатор компании.</param>
+        /// <returns>Контекст базы данных компании.</returns>
+        private async Task<CompanyDbContext> GetCompanyDbContext(int companyId)
+        {
+            var company = await _context.Companies.FindAsync(companyId);
+            if (company == null) return null;
+
+            string databaseName = $"w{company.Name.Replace(" ", "_")}";
+            string connectionString = _configuration.GetConnectionString("CompanyDatabaseTemplate").Replace("{0}", databaseName);
+            return new CompanyDbContext(connectionString);
+        }
+
 
         /// <summary>
         /// Возвращает страницу входа.
@@ -89,12 +106,15 @@ namespace AspNetCore_MVC_Project.Controllers
             _logger.LogInformation("Попытка регистрации пользователя {Email}", model.Email);
 
             // Проверяем, существует ли компания
-            var company = _context.Companies.FirstOrDefault(c => c.Name == model.CompanyName);
+            var company = await _context.Companies.FirstOrDefaultAsync(c => c.Name == model.CompanyName);
+            bool isNewCompany = false; // Флаг новой компании
+
             if (company == null)
             {
                 company = new Company { Name = model.CompanyName };
                 _context.Companies.Add(company);
                 await _context.SaveChangesAsync();
+                isNewCompany = true;
                 _logger.LogInformation("Создана новая компания: {CompanyName}", model.CompanyName);
             }
 
@@ -118,24 +138,21 @@ namespace AspNetCore_MVC_Project.Controllers
                     _logger.LogInformation("Добавлены модули для компании {CompanyName}", company.Name);
                 }
 
-                // Создаем базу данных для компании
-                string databaseName = $"w{company.Name.Replace(" ", "_")}";
-                string connectionString = GetCompanyConnectionString(databaseName);
-                _logger.LogInformation("Попытка создания базы данных: {DatabaseName}", databaseName);
-
-                try
+                // Создание базы данных компании при первой регистрации
+                if (isNewCompany)
                 {
-                    using (var dbContext = new CompanyDbContext(connectionString))
+                    var dbContext = await GetCompanyDbContext(company.Id);
+                    if (dbContext != null)
                     {
-                        dbContext.Database.EnsureCreated();
+                        dbContext.Database.EnsureCreated(); // Создаём базу
+
+                        // Добавляем записи в таблицу Mark
+                        dbContext.Marks.Add(new Mark { Title = "Creator", Value = user.UserName });
+                        dbContext.Marks.Add(new Mark { Title = "Service", Value = "0" });
+
+                        await dbContext.SaveChangesAsync();
+                        _logger.LogInformation("База данных {DatabaseName} успешно создана", $"w{company.Name.Replace(" ", "_")}");
                     }
-                    _logger.LogInformation("База данных {DatabaseName} успешно создана", databaseName);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Ошибка при создании базы данных {DatabaseName}", databaseName);
-                    ModelState.AddModelError("", "Ошибка при создании базы компании. Обратитесь к администратору.");
-                    return View(model);
                 }
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
