@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления аутентификацией и регистрацией пользователей.
+    /// </summary>
     public class AccountController : BaseController
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -16,6 +19,14 @@ namespace AspNetCore_MVC_Project.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<AccountController> _logger;
 
+        /// <summary>
+        /// Конструктор AccountController.
+        /// </summary>
+        /// <param name="signInManager">Менеджер входа в систему.</param>
+        /// <param name="userManager">Менеджер пользователей.</param>
+        /// <param name="context">Контекст базы данных.</param>
+        /// <param name="configuration">Конфигурация приложения.</param>
+        /// <param name="logger">Логгер для отслеживания событий.</param>
         public AccountController(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
@@ -30,8 +41,15 @@ namespace AspNetCore_MVC_Project.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Возвращает страницу входа.
+        /// </summary>
         public IActionResult Login() => View();
 
+        /// <summary>
+        /// Обрабатывает попытку входа пользователя в систему.
+        /// </summary>
+        /// <param name="model">Данные входа (логин, пароль).</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -50,8 +68,15 @@ namespace AspNetCore_MVC_Project.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Возвращает страницу регистрации.
+        /// </summary>
         public IActionResult Register() => View();
 
+        /// <summary>
+        /// Обрабатывает регистрацию нового пользователя.
+        /// </summary>
+        /// <param name="model">Данные регистрации (email, пароль, компания, модули).</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
@@ -126,6 +151,9 @@ namespace AspNetCore_MVC_Project.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Обрабатывает выход пользователя из системы.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -136,3 +164,4 @@ namespace AspNetCore_MVC_Project.Controllers
         }
     }
 }
+
