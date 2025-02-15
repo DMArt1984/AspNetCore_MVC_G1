@@ -50,7 +50,7 @@ builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 /// </summary>
 var app = builder.Build();
 
-// ✅ Убеждаемся, что таблицы существуют
+// Убеждаемся, что таблицы существуют
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
