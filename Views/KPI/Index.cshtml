@@ -1,0 +1,29 @@
+@model List<AspNetCore_MVC_Project.Models.Statistic>
+
+@{
+    ViewData["Title"] = "KPI - Statistics";
+}
+
+<h2>Statistics</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Kf1</th>
+            <th>Kf2</th>
+            <th>Kf3</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.Title</td>
+                <td>@stat.Kf1</td>
+                <td>@stat.Kf2</td>
+                <td>@stat.Kf3</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,14 @@
+@model List<AspNetCore_MVC_Project.Models.Job>
+
+@{
+    ViewData["Title"] = "Business - Job List";
+}
+
+<h2>Job List</h2>
+
+<ul>
+    @foreach (var job in Model)
+    {
+        <li>@job.Title - Analog Value: @job.AnalogValue</li>
+    }
+</ul>
