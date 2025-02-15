@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 /// "DefaultConnection" используется для подключения к основной базе данных.
 /// </summary>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionCompanyMigrationString = builder.Configuration.GetConnectionString("CompanyDatabaseMigration");
 
 /// <summary>
 /// Добавление сервиса DbContext с использованием SQL Server.
@@ -25,6 +26,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+// Добавляем `CompanyDbContext` для работы с миграциями
+builder.Services.AddDbContext<CompanyDbContext>(options =>
+    options.UseSqlServer(connectionCompanyMigrationString));
+
 
 /// <summary>
 /// Добавление MVC-контроллеров с поддержкой представлений.
