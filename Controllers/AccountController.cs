@@ -71,19 +71,50 @@ namespace AspNetCore_MVC_Project.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                if (result.Succeeded)
+                return View(model);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("Пользователь {Email} успешно вошел в систему", model.Email);
+
+                // Получаем пользователя
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user?.CompanyId != null)
                 {
-                    _logger.LogInformation("Пользователь {Email} успешно вошел в систему", model.Email);
-                    return RedirectToAction("Index", "Home");
+                    var dbContext = await GetCompanyDbContext(user.CompanyId.Value);
+                    if (dbContext != null)
+                    {
+                        dbContext.Database.EnsureCreated(); // Автоматически создаёт таблицы, если их нет
+                        // ✅ Вместо EnsureCreated() используем Migrate() для обновления схемы
+                        //dbContext.Database.Migrate();
+                        _logger.LogInformation("Синхронизация базы компании {DatabaseName} завершена", $"w{user.Company.Name}");
+
+                        // Проверяем, есть ли таблица Mark
+                        //if (!await dbContext.Marks.AnyAsync())
+                        //{
+                        //    _logger.LogInformation("Создаётся таблица Mark для компании {DatabaseName}", $"w{user.Company.Name}");
+
+                        //    // Добавляем записи в таблицу Mark
+                        //    dbContext.Marks.Add(new Mark { Title = "Creator", Value = user.UserName });
+                        //    dbContext.Marks.Add(new Mark { Title = "Service", Value = "0" });
+
+                        //    await dbContext.SaveChangesAsync();
+                        //    _logger.LogInformation("Записи Mark созданы для компании {DatabaseName}", $"w{user.Company.Name}");
+                        //}
+                    }
                 }
 
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return RedirectToAction("Index", "Home");
             }
+
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View(model);
         }
+
 
         /// <summary>
         /// Возвращает страницу регистрации.
