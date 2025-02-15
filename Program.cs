@@ -50,6 +50,14 @@ builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 /// </summary>
 var app = builder.Build();
 
+// ✅ Убеждаемся, что таблицы существуют
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<CompanyDbContext>();
+    dbContext.EnsureTablesCreated();
+}
+
 /// <summary>
 /// Настройка обработки ошибок для продакшн-режима.
 /// Если приложение работает не в режиме разработки, используется страница ошибки и HSTS.

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspNetCore_MVC_Project.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20250215162837_AddMarkTableOnly")]
+    [Migration("20250215164631_AddMarkTableOnly")]
     partial class AddMarkTableOnly
     {
         /// <inheritdoc />
