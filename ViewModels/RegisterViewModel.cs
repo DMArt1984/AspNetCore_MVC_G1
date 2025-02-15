@@ -1,5 +1,5 @@
+﻿using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace AspNetCore_MVC_Project.ViewModels
 {
@@ -19,8 +19,10 @@ namespace AspNetCore_MVC_Project.ViewModels
         public string ConfirmPassword { get; set; }
 
         [Required]
+        [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
 
-        public List<string> SelectedModules { get; set; } = new List<string>();
+        [Display(Name = "Select Modules")]
+        public List<string> SelectedModules { get; set; }
     }
 }

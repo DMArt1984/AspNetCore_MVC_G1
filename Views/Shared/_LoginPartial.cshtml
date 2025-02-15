@@ -1,28 +1,21 @@
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
-@inject AspNetCore_MVC_Project.Data.ApplicationDbContext DbContext
-
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@if (User.Identity.IsAuthenticated)
 {
-    var currentUser = await UserManager.GetUserAsync(User);
-    var company = currentUser?.CompanyId != null ? DbContext.Companies.FirstOrDefault(c => c.Id == currentUser.CompanyId) : null;
     <li class="nav-item">
-        <span class="navbar-text me-3">🏢 @(company?.Name ?? "No Company")</span>
-    </li>
-    <li class="nav-item">
-        <span class="navbar-text me-3">👤 @User.Identity?.Name</span>
+        <span class="nav-link">Hello, @User.Identity.Name!</span>
     </li>
     <li class="nav-item">
         <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="btn btn-link nav-link">Logout</button>
+            <button type="submit" class="btn btn-link">Logout</button>
         </form>
     </li>
 }
 else
 {
-    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Login</a></li>
-    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Register">Register</a></li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+    </li>
 }
-</ul>
+

@@ -28,7 +28,7 @@ namespace AspNetCore_MVC_Project.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Защита от CSRF-атак
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -44,40 +44,52 @@ namespace AspNetCore_MVC_Project.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Защита от CSRF-атак
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var company = _context.Companies.FirstOrDefault(c => c.Name == model.CompanyName);
-                if (company == null)
+                return View(model); // Возвращаем форму с ошибками
+            }
+
+            var company = _context.Companies.FirstOrDefault(c => c.Name == model.CompanyName);
+            if (company == null)
+            {
+                company = new Company { Name = model.CompanyName };
+                _context.Companies.Add(company);
+                await _context.SaveChangesAsync();
+            }
+
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CompanyId = company.Id };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                if (model.SelectedModules != null && model.SelectedModules.Any())
                 {
-                    company = new Company { Name = model.CompanyName };
-                    _context.Companies.Add(company);
+                    foreach (var module in model.SelectedModules)
+                    {
+                        var buyModule = new BuyModule { NameController = module, CompanyId = company.Id };
+                        _context.BuyModules.Add(buyModule);
+                    }
                     await _context.SaveChangesAsync();
                 }
 
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CompanyId = company.Id };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    string databaseName = $"w{company.Name.Replace(" ", "_")}";
-                    string connectionString = GetCompanyConnectionString(databaseName); // Используем метод из BaseController
-
-                    using (var dbContext = new CompanyDbContext(connectionString))
-                    {
-                        dbContext.Database.EnsureCreated();
-                    }
-
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
             }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
             return View(model);
         }
 
+
         [HttpPost]
-        [ValidateAntiForgeryToken] // Защита от CSRF-атак
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

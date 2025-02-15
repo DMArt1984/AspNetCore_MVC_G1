@@ -4,6 +4,6 @@ namespace AspNetCore_MVC_Project.Models
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public double AnalogValue { get; set; }
+        public decimal AnalogValue { get; set; }
     }
 }
