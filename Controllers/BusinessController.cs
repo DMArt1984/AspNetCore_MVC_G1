@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 namespace AspNetCore_MVC_Project.Controllers
 {
     [Authorize]
-    public class BusinessController : Controller
+    public class BusinessController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public BusinessController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public BusinessController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IConfiguration configuration)
+            : base(configuration)
         {
             _userManager = userManager;
             _context = context;
@@ -29,11 +30,10 @@ namespace AspNetCore_MVC_Project.Controllers
             var company = await _context.Companies.FindAsync(user.CompanyId);
             if (company == null) return null;
 
-            // Проверка доступа к контроллеру Business в BuyModules
             bool hasAccess = await _context.BuyModules.AnyAsync(bm => bm.CompanyId == user.CompanyId && bm.NameController == "Business");
             if (!hasAccess) return null;
 
-            string connectionString = $"Server=DESKTOP-PVGO5SO\\MSSQLSERVER01;Database=w{company.Name.Replace(" ", "_")};Trusted_Connection=True;TrustServerCertificate=True;";
+            string connectionString = GetCompanyConnectionString($"w{company.Name.Replace(" ", "_")}");
             return new CompanyDbContext(connectionString);
         }
 

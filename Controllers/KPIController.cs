@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 namespace AspNetCore_MVC_Project.Controllers
 {
     [Authorize]
-    public class KPIController : Controller
+    public class KPIController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public KPIController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public KPIController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IConfiguration configuration)
+            : base(configuration)
         {
             _userManager = userManager;
             _context = context;
@@ -29,11 +30,10 @@ namespace AspNetCore_MVC_Project.Controllers
             var company = await _context.Companies.FindAsync(user.CompanyId);
             if (company == null) return null;
 
-            // Проверка доступа к контроллеру KPI в BuyModules
             bool hasAccess = await _context.BuyModules.AnyAsync(bm => bm.CompanyId == user.CompanyId && bm.NameController == "KPI");
             if (!hasAccess) return null;
 
-            string connectionString = $"Server=DESKTOP-PVGO5SO\\MSSQLSERVER01;Database=w{company.Name.Replace(" ", "_")};Trusted_Connection=True;TrustServerCertificate=True;";
+            string connectionString = GetCompanyConnectionString($"w{company.Name.Replace(" ", "_")}");
             return new CompanyDbContext(connectionString);
         }
 
