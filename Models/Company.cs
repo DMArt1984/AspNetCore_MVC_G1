@@ -2,10 +2,34 @@ using System.Collections.Generic;
 
 namespace AspNetCore_MVC_Project.Models
 {
+    /// <summary>
+    /// Модель компании, представляющая организацию, к которой могут принадлежать пользователи.
+    /// Каждая компания может иметь множество пользователей и доступных модулей.
+    /// </summary>
     public class Company
     {
+        /// <summary>
+        /// Уникальный идентификатор компании.
+        /// Автоматически генерируется базой данных.
+        /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Название компании.
+        /// Должно быть уникальным в системе.
+        /// </summary>
         public string Name { get; set; }
-        public virtual ICollection<ApplicationUser> Users { get; set; }
+
+        /// <summary>
+        /// Навигационное свойство для списка пользователей, принадлежащих компании.
+        /// Один ко многим: одна компания - много пользователей.
+        /// </summary>
+        public virtual ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+
+        /// <summary>
+        /// Навигационное свойство для списка модулей, доступных компании.
+        /// Один ко многим: одна компания - много модулей.
+        /// </summary>
+        public virtual ICollection<BuyModule> BuyModules { get; set; } = new List<BuyModule>();
     }
 }
