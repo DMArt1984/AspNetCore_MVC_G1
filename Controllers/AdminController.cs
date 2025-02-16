@@ -13,7 +13,7 @@ public class AdminController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> ManagePermissions(int factoryId)
+    public async Task<IActionResult> ManageOptions(int factoryId)
     {
         var factory = await _context.Factories.FindAsync(factoryId);
         if (factory == null) return NotFound();
@@ -24,7 +24,7 @@ public class AdminController : Controller
             .Select(p => p.OptionBlockId)
             .ToListAsync();
 
-        var model = new PermissionsViewModel
+        var model = new OptionsViewModel
         {
             FactoryId = factory.Id,
             FactoryName = factory.Title,
@@ -36,25 +36,25 @@ public class AdminController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> UpdatePermissions(PermissionsViewModel model)
+    public async Task<IActionResult> UpdateOptions(OptionsViewModel model)
     {
-        var existingPermissions = _context.Purchases
+        var existingOptions = _context.Purchases
             .Where(p => p.FactoryId == model.FactoryId);
-        _context.Purchases.RemoveRange(existingPermissions); // Удаляем старые разрешения
+        _context.Purchases.RemoveRange(existingOptions); // Удаляем старые разрешения
 
         if (model.SelectedModules != null)
         {
-            var newPermissions = model.SelectedModules
+            var newOptions = model.SelectedModules
                 .Select(moduleId => new Purchase
                 {
                     FactoryId = model.FactoryId,
                     OptionBlockId = moduleId
                 });
 
-            _context.Purchases.AddRange(newPermissions);
+            _context.Purchases.AddRange(newOptions);
         }
 
         await _context.SaveChangesAsync();
-        return RedirectToAction("ManagePermissions", new { factoryId = model.FactoryId });
+        return RedirectToAction("ManageOptions", new { factoryId = model.FactoryId });
     }
 }

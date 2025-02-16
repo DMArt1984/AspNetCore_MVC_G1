@@ -1,8 +1,8 @@
-﻿@model AspNetCore_MVC_Project.ViewModels.PermissionsViewModel
+﻿@model AspNetCore_MVC_Project.ViewModels.OptionsViewModel
 
 <h2>Настройки доступа для компании @Model.FactoryName</h2>
 
-<form asp-controller="Admin" asp-action="UpdatePermissions" method="post">
+<form asp-controller="Admin" asp-action="UpdateOptions" method="post">
     <input type="hidden" name="FactoryId" value="@Model.FactoryId" />
 
     @foreach (var module in Model.AllModules)

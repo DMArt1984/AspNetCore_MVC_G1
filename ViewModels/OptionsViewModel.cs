@@ -3,7 +3,7 @@
 namespace AspNetCore_MVC_Project.ViewModels
 {
 
-    public class PermissionsViewModel
+    public class OptionsViewModel
     {
         public int FactoryId { get; set; }
         public string FactoryName { get; set; }

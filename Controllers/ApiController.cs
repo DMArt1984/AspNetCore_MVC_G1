@@ -178,8 +178,8 @@ namespace AspNetCore_MVC_Project.Controllers
         /// <summary>
         /// Получает список разрешений компании.
         /// </summary>
-        [HttpGet("permissions/{companyId}")]
-        public async Task<IActionResult> GetPermissions(int companyId)
+        [HttpGet("options/{companyId}")]
+        public async Task<IActionResult> GetOptions(int companyId)
         {
             var modules = await _context.Purchases
                 .Where(bm => bm.FactoryId == companyId)
