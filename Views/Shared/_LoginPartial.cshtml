@@ -1,23 +1,4 @@
-@* @if (User.Identity.IsAuthenticated)
-{
-    <li class="nav-item">
-        <span class="nav-link">Hello, @User.Identity.Name!</span>
-    </li>
-    <li class="nav-item">
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="btn btn-link">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
-    </li>
-} *@
+
 
 @using Microsoft.AspNetCore.Identity
 @using AspNetCore_MVC_Project.Models
@@ -26,13 +7,29 @@ else
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
 
+@functions {
+    public async Task<string> GetCompanyName(ApplicationUser user)
+    {
+        if (user?.CompanyId != null)
+        {
+            var company = await DbContext.Companies.FindAsync(user.CompanyId);
+            return company?.Name ?? "No Company";
+        }
+        return "No Company";
+    }
+
+
+}
+
+
+
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
 
         if (user != null) {
-            var companyName = "No Company"; // Значение по умолчанию
+            @* var companyName = "No Company"; // Значение по умолчанию
 
             if (user?.CompanyId != null)
             {
@@ -41,7 +38,8 @@ else
                 {
                     companyName = company.Name;
                 }
-            }
+            } *@
+            var companyName = await GetCompanyName(user);
 
             <li class="nav-item">
                 <span class="nav-link">
@@ -56,22 +54,12 @@ else
         } else
         {
             <!-- default -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-            </li>
+            @await Html.PartialAsync("_LoginRegisterLinks")
         }
     }
     else
     {
         <!-- default -->
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-        </li>
+        @await Html.PartialAsync("_LoginRegisterLinks")
     }
 </ul>
