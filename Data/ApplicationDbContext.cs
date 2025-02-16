@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using AspNetCore_MVC_Project.Models;
+using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Data
 {
@@ -10,7 +10,7 @@ namespace AspNetCore_MVC_Project.Data
             : base(options) { }
 
         public DbSet<Company> Companies { get; set; }
-        public DbSet<BuyModule> BuyModules { get; set; }
+        public DbSet<Purchase> Purchases { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

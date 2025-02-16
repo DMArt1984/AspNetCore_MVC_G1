@@ -7,6 +7,8 @@ using AspNetCore_MVC_Project.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using AspNetCore_MVC_Project.Models.Control;
+using AspNetCore_MVC_Project.Models.Factory;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
@@ -162,8 +164,8 @@ namespace AspNetCore_MVC_Project.Controllers
                 {
                     foreach (var module in model.SelectedModules)
                     {
-                        var buyModule = new BuyModule { NameController = module, CompanyId = company.Id };
-                        _context.BuyModules.Add(buyModule);
+                        var buyModule = new Purchase { NameController = module, CompanyId = company.Id };
+                        _context.Purchases.Add(buyModule);
                     }
                     await _context.SaveChangesAsync();
                     _logger.LogInformation("Добавлены модули для компании {CompanyName}", company.Name);

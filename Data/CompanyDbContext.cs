@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AspNetCore_MVC_Project.Models;
 using Npgsql;
+using AspNetCore_MVC_Project.Models.Factory;
 
 namespace AspNetCore_MVC_Project.Data
 {

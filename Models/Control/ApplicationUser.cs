@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace AspNetCore_MVC_Project.Models
+namespace AspNetCore_MVC_Project.Models.Control
 {
     /// <summary>
     /// Расширенная модель пользователя для системы аутентификации.

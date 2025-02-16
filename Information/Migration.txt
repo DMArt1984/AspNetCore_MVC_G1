@@ -18,7 +18,7 @@ namespace AspNetCore_MVC_Project.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // ✅ Создаём таблицу Marks только если её ещё нет
+            // Создаём таблицу Marks только если её ещё нет
             migrationBuilder.Sql(@"
                 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Marks' AND xtype='U')
                 CREATE TABLE Marks (
@@ -32,7 +32,7 @@ namespace AspNetCore_MVC_Project.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // ✅ Удаляем только Marks, но если таблица есть
+            // Удаляем только Marks, но если таблица есть
             migrationBuilder.Sql(@"
                 IF EXISTS (SELECT * FROM sysobjects WHERE name='Marks' AND xtype='U')
                 DROP TABLE Marks

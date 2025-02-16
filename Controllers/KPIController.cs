@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using AspNetCore_MVC_Project.Models;
 using AspNetCore_MVC_Project.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
@@ -48,7 +48,7 @@ namespace AspNetCore_MVC_Project.Controllers
             if (company == null) return null;
 
             // Проверяем, есть ли у компании доступ к модулю "KPI"
-            bool hasAccess = await _context.BuyModules.AnyAsync(bm => bm.CompanyId == user.CompanyId && bm.NameController == "KPI");
+            bool hasAccess = await _context.Purchases.AnyAsync(bm => bm.CompanyId == user.CompanyId && bm.NameController == "KPI");
             if (!hasAccess) return null;
 
             // Формируем строку подключения и создаем контекст для базы данных компании

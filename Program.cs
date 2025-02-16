@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Data;
-using AspNetCore_MVC_Project.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
+using AspNetCore_MVC_Project.Models.Control;
 
 var builder = WebApplication.CreateBuilder(args);
 

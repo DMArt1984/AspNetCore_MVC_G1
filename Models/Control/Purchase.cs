@@ -1,10 +1,10 @@
-namespace AspNetCore_MVC_Project.Models
+namespace AspNetCore_MVC_Project.Models.Control
 {
     /// <summary>
     /// Модель для управления доступными модулями компании.
     /// Определяет, какие контроллеры доступны для компании.
     /// </summary>
-    public class BuyModule
+    public class Purchase
     {
         /// <summary>
         /// Уникальный идентификатор записи в таблице BuyModules.

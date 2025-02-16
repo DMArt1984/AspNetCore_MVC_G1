@@ -1,4 +1,4 @@
-namespace AspNetCore_MVC_Project.Models
+namespace AspNetCore_MVC_Project.Models.Factory
 {
     /// <summary>
     /// Модель данных для таблицы Statistic.

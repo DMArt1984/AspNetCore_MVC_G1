@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore_MVC_Project.Models.Control;
+using AspNetCore_MVC_Project.Models.Factory;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
@@ -179,7 +181,7 @@ namespace AspNetCore_MVC_Project.Controllers
         [HttpGet("permissions/{companyId}")]
         public async Task<IActionResult> GetPermissions(int companyId)
         {
-            var modules = await _context.BuyModules
+            var modules = await _context.Purchases
                 .Where(bm => bm.CompanyId == companyId)
                 .Select(bm => bm.NameController)
                 .ToListAsync();

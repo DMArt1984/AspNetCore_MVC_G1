@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace AspNetCore_MVC_Project.Models
+namespace AspNetCore_MVC_Project.Models.Control
 {
     /// <summary>
     /// Модель компании, представляющая организацию, к которой могут принадлежать пользователи.
@@ -30,6 +30,6 @@ namespace AspNetCore_MVC_Project.Models
         /// Навигационное свойство для списка модулей, доступных компании.
         /// Один ко многим: одна компания - много модулей.
         /// </summary>
-        public virtual ICollection<BuyModule> BuyModules { get; set; } = new List<BuyModule>();
+        public virtual ICollection<Purchase> BuyModules { get; set; } = new List<Purchase>();
     }
 }
