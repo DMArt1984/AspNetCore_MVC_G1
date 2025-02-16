@@ -1,0 +1,19 @@
+﻿@model AspNetCore_MVC_Project.ViewModels.PermissionsViewModel
+
+<h2>Настройки доступа для компании @Model.FactoryName</h2>
+
+<form asp-controller="Admin" asp-action="UpdatePermissions" method="post">
+    <input type="hidden" name="FactoryId" value="@Model.FactoryId" />
+
+    @foreach (var module in Model.AllModules)
+    {
+        <div class="form-check">
+            <input type="checkbox" name="SelectedModules" value="@module.Id"
+                   class="form-check-input"
+            @(Model.AssignedModules.Contains(module.Id) ? "checked" : "") />
+            <label class="form-check-label">@module.NameController</label>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+</form>
