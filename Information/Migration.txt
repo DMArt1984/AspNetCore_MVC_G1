@@ -1,8 +1,11 @@
 ﻿
+Remove-Migration -Context ApplicationDbContext
 Remove-Migration -Context CompanyDbContext
 
+Add-Migration First -Context ApplicationDbContext
 Add-Migration AddMarkTableOnly -Context CompanyDbContext
 
+Update-Database -Context ApplicationDbContext
 Update-Database -Context CompanyDbContext
 
 ===========================================================================

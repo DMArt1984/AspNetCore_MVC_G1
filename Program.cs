@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Data;
 using AspNetCore_MVC_Project.Models;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ var connectionCompanyMigrationString = builder.Configuration.GetConnectionString
 /// ApplicationDbContext - основной контекст базы данных приложения, содержащий таблицы пользователей и компаний.
 /// </summary>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 /// <summary>
 /// Настройка системы аутентификации и управления пользователями.
@@ -29,7 +30,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 // Добавляем `CompanyDbContext` для работы с миграциями
 builder.Services.AddDbContext<CompanyDbContext>(options =>
-    options.UseSqlServer(connectionCompanyMigrationString));
+    options.UseNpgsql(connectionCompanyMigrationString));
 
 
 /// <summary>
