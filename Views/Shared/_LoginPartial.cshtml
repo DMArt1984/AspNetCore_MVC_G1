@@ -30,30 +30,43 @@ else
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        var companyName = "No Company"; // Значение по умолчанию
 
-        if (user?.CompanyId != null)
-        {
-            var company = await DbContext.Companies.FindAsync(user.CompanyId);
-            if (company != null)
+        if (user != null) {
+            var companyName = "No Company"; // Значение по умолчанию
+
+            if (user?.CompanyId != null)
             {
-                companyName = company.Name;
+                var company = await DbContext.Companies.FindAsync(user.CompanyId);
+                if (company != null)
+                {
+                    companyName = company.Name;
+                }
             }
-        }
 
-        <li class="nav-item">
-            <span class="nav-link">
-                Hello, <string>@user.UserName</string> from @companyName!
-            </span>
-        </li>
-        <li class="nav-item">
-            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                <button type="submit" class="btn btn-link nav-link">Logout</button>
-            </form>
-        </li>
+            <li class="nav-item">
+                <span class="nav-link">
+                    Hello, <string>@user.UserName</string> from @companyName!
+                </span>
+            </li>
+            <li class="nav-item">
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                </form>
+            </li>
+        } else
+        {
+            <!-- default -->
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+            </li>
+        }
     }
     else
     {
+        <!-- default -->
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
         </li>
