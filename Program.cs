@@ -7,6 +7,12 @@ using AspNetCore_MVC_Project.Models.Control;
 var builder = WebApplication.CreateBuilder(args);
 
 /// <summary>
+/// Логирование
+/// </summary>
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); // Логи будут видны в консоли
+
+/// <summary>
 /// Получение строки подключения из файла конфигурации appsettings.json.
 /// "DefaultConnection" используется для подключения к основной базе данных.
 /// </summary>
