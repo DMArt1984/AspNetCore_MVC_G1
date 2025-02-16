@@ -1,10 +1,12 @@
+п»їusing Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using AspNetCore_MVC_Project.Models;
 using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Factory> Factories { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
@@ -17,21 +19,22 @@ namespace AspNetCore_MVC_Project.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); // РћР‘РЇР—РђРўР•Р›Р¬РќРћ РІС‹Р·С‹РІР°РµРј Р±Р°Р·РѕРІС‹Р№ РјРµС‚РѕРґ!
 
-            // Связь "Покупка - Компания" (многие-к-одному)
+            // РЎРІСЏР·СЊ "РџРѕРєСѓРїРєР° - РљРѕРјРїР°РЅРёСЏ" (РјРЅРѕРіРёРµ-Рє-РѕРґРЅРѕРјСѓ)
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Factory)
                 .WithMany()
                 .HasForeignKey(p => p.FactoryId)
-                .OnDelete(DeleteBehavior.SetNull); // Если компания удаляется, FactoryId = NULL
+                .OnDelete(DeleteBehavior.SetNull); // Р•СЃР»Рё РєРѕРјРїР°РЅРёСЏ СѓРґР°Р»СЏРµС‚СЃСЏ, FactoryId = NULL
 
-            // Связь "Покупка - OptionBlock" (многие-к-одному)
+            // РЎРІСЏР·СЊ "РџРѕРєСѓРїРєР° - OptionBlock" (РјРЅРѕРіРёРµ-Рє-РѕРґРЅРѕРјСѓ)
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.OptionBlock)
                 .WithMany(o => o.Purchases)
                 .HasForeignKey(p => p.OptionBlockId)
-                .OnDelete(DeleteBehavior.Cascade); // Если `OptionBlock` удаляется, все связанные `Purchase` тоже удаляются
+                .OnDelete(DeleteBehavior.Cascade); // Р•СЃР»Рё `OptionBlock` СѓРґР°Р»СЏРµС‚СЃСЏ, РІСЃРµ СЃРІСЏР·Р°РЅРЅС‹Рµ `Purchase` С‚РѕР¶Рµ СѓРґР°Р»СЏСЋС‚СЃСЏ
         }
     }
 }
+

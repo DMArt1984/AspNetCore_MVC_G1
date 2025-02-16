@@ -40,3 +40,28 @@ namespace AspNetCore_MVC_Project.Migrations
         }
     }
 }
+
+====================================================
+
+protected override void Up(MigrationBuilder migrationBuilder)
+{
+    // Создание таблицы OptionBlocks
+    migrationBuilder.CreateTable(
+        name: "OptionBlocks",
+        columns: table => new
+        {
+            Id = table.Column<int>(nullable: false)
+                .Annotation("SqlServer:Identity", "1, 1"),
+            NameController = table.Column<string>(nullable: true)
+        },
+        constraints: table =>
+        {
+            table.PrimaryKey("PK_OptionBlocks", x => x.Id);
+        });
+
+    // Добавление записей для каждого контроллера
+    migrationBuilder.Sql("INSERT INTO OptionBlocks (NameController) VALUES ('Home')");
+    migrationBuilder.Sql("INSERT INTO OptionBlocks (NameController) VALUES ('Account')");
+    migrationBuilder.Sql("INSERT INTO OptionBlocks (NameController) VALUES ('Product')");
+    // Добавьте остальные контроллеры по аналогии
+}
