@@ -1,46 +1,38 @@
-
-
 @using AspNetCore_MVC_Project.Data
 @using AspNetCore_MVC_Project.Models
 @using AspNetCore_MVC_Project.Models.Control
 @using Microsoft.AspNetCore.Identity
+
+// Внедрение зависимостей для работы с аутентификацией и базой данных
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
 
 @functions {
+    /// <summary>
+    /// Получает название компании, к которой привязан пользователь.
+    /// </summary>
+    /// <param name="user">Текущий пользователь</param>
+    /// <returns>Название компании или "No Company", если компания не найдена</returns>
     public async Task<string> GetCompanyName(ApplicationUser user)
     {
-        if (user?.FactoryId != null)
+        if (user?.FactoryId != null) // Проверяем, есть ли у пользователя привязанная компания
         {
-            var company = await DbContext.Factories.FindAsync(user.FactoryId);
-            return company?.Title ?? "No Company";
+            var company = await DbContext.Factories.FindAsync(user.FactoryId); // Ищем компанию в базе данных
+            return company?.Title ?? "No Company"; // Если компания найдена, возвращаем её название, иначе "No Company"
         }
-        return "No Company";
+        return "No Company"; // Если у пользователя нет компании, возвращаем "No Company"
     }
-
-
 }
 
-
-
 <ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
+    @if (SignInManager.IsSignedIn(User)) // Проверяем, авторизован ли пользователь
     {
-        var user = await UserManager.GetUserAsync(User);
+        var user = await UserManager.GetUserAsync(User); // Получаем текущего пользователя
 
-        if (user != null) {
-            @* var companyName = "No Company"; // Значение по умолчанию
-
-            if (user?.CompanyId != null)
-            {
-                var company = await DbContext.Companies.FindAsync(user.CompanyId);
-                if (company != null)
-                {
-                    companyName = company.Name;
-                }
-            } *@
-            var companyName = await GetCompanyName(user);
+        if (user != null) // Проверяем, что пользователь найден
+        {
+            var companyName = await GetCompanyName(user); // Получаем название компании пользователя
 
             <li class="nav-item">
                 <span class="nav-link">
@@ -48,19 +40,21 @@
                 </span>
             </li>
             <li class="nav-item">
+                <!-- Форма выхода из системы -->
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="btn btn-link nav-link">Logout</button>
                 </form>
             </li>
-        } else
+        }
+        else
         {
-            <!-- default -->
+            <!-- Если пользователь не найден, показываем ссылки на вход и регистрацию -->
             @await Html.PartialAsync("_LoginRegisterLinks")
         }
     }
     else
     {
-        <!-- default -->
+        <!-- Если пользователь не авторизован, показываем ссылки на вход и регистрацию -->
         @await Html.PartialAsync("_LoginRegisterLinks")
     }
 </ul>

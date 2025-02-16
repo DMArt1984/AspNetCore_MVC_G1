@@ -2,17 +2,22 @@
 @using AspNetCore_MVC_Project.Models
 @using AspNetCore_MVC_Project.Models.Control
 @using Microsoft.AspNetCore.Identity
+
+// Внедрение зависимостей для управления пользователями и работы с БД
 @inject UserManager<ApplicationUser> UserManager
 @inject ApplicationDbContext DbContext
 
 @{
+    // Получаем текущего пользователя
     var user = await UserManager.GetUserAsync(User);
+
+    // Определяем список доступных модулей для текущего пользователя
     var userModules = user != null
         ? DbContext.Purchases
             .Where(b => b.FactoryId == user.FactoryId)
             .Select(b => b.OptionBlock.NameController) // Теперь получаем NameController через OptionBlock
             .ToList()
-        : new List<string>();
+        : new List<string>(); // Если пользователь не авторизован, создаем пустой список
 }
 
 <!DOCTYPE html>
@@ -21,24 +26,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AspNetCore_MVC_Project</title>
+
+    <!-- Подключение Bootstrap 5 для стилизации -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 </head>
 <body>
     <header>
+        <!-- Навигационная панель (Navbar) -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
+                <!-- Логотип и главная ссылка -->
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">AspNetCore MVC</a>
+
+                <!-- Кнопка для раскрытия меню на мобильных устройствах -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
+                <!-- Основное меню навигации -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
+                        <!-- Проверяем, есть ли у пользователя доступ к модулю "Business" -->
                         @if (userModules.Contains("Business"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Business" asp-action="Index">Business</a>
                             </li>
                         }
+                        <!-- Проверяем, есть ли у пользователя доступ к модулю "KPI" -->
                         @if (userModules.Contains("KPI"))
                         {
                             <li class="nav-item">
@@ -46,6 +61,8 @@
                             </li>
                         }
                     </ul>
+
+                    <!-- Кнопка "Настроить доступ" видна только авторизованным пользователям -->
                     @if (user != null)
                     {
                         <ul class="navbar-nav">
@@ -53,22 +70,31 @@
                                class="btn btn-outline-primary nav-link">Настроить доступ</a>
                         </ul>
                     }
+
+                    <!-- Правый блок навигации с кнопками входа/регистрации -->
                     <ul class="navbar-nav ms-auto">
-                        <partial name="_LoginPartial" />
+                        <partial name="_LoginPartial" /> <!-- Подключаем `_LoginPartial.cshtml` для отображения кнопок входа и выхода -->
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Основной контейнер, в котором рендерится контент страниц -->
     <div class="container mt-4">
         @RenderBody()
     </div>
+
+    <!-- Футер (подвал страницы) -->
     <footer class="border-top footer text-muted text-center mt-4">
         <div class="container">
             &copy; 2024 - AspNetCore_MVC_Project
         </div>
     </footer>
+
+    <!-- Подключение скриптов Bootstrap 5 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 

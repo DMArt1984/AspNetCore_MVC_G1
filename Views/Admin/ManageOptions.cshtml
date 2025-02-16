@@ -1,6 +1,6 @@
 ﻿@model AspNetCore_MVC_Project.ViewModels.OptionsViewModel
 
-<h2>Настройки доступа для компании @Model.FactoryName</h2>
+<h2>Настройки доступа для компании @Model.FactoryTitle</h2>
 
 <form asp-controller="Admin" asp-action="UpdateOptions" method="post">
     <input type="hidden" name="FactoryId" value="@Model.FactoryId" />
