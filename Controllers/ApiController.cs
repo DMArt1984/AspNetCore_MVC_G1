@@ -46,10 +46,10 @@ namespace AspNetCore_MVC_Project.Controllers
         /// <returns>Контекст базы данных компании.</returns>
         private async Task<CompanyDbContext> GetCompanyDbContext(int companyId)
         {
-            var company = await _context.Companies.FindAsync(companyId);
+            var company = await _context.Factories.FindAsync(companyId);
             if (company == null) return null;
 
-            string databaseName = $"w{company.Name.Replace(" ", "_")}";
+            string databaseName = $"w{company.Title.Replace(" ", "_")}";
             string connectionString = _configuration.GetConnectionString("CompanyDatabaseTemplate").Replace("{0}", databaseName);
             return new CompanyDbContext(connectionString);
         }
@@ -63,12 +63,12 @@ namespace AspNetCore_MVC_Project.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var users = await _userManager.Users
-                .Include(u => u.Company) // Загружаем данные о компании
+                .Include(u => u.Factory) // Загружаем данные о компании
                 .Select(u => new
                 {
                     u.Id,
                     u.Email,
-                    Company = u.Company != null ? u.Company.Name : "Нет компании"
+                    Company = u.Factory != null ? u.Factory.Title : "Нет компании"
                 })
                 .ToListAsync();
 
@@ -84,11 +84,11 @@ namespace AspNetCore_MVC_Project.Controllers
             if (await _userManager.FindByEmailAsync(model.Email) != null)
                 return BadRequest(new { message = "Пользователь с таким Email уже существует." });
 
-            var company = await _context.Companies.FindAsync(model.CompanyId);
+            var company = await _context.Factories.FindAsync(model.CompanyId);
             if (company == null)
                 return BadRequest(new { message = "Компания не найдена." });
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CompanyId = company.Id };
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FactoryId = company.Id };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
@@ -120,8 +120,8 @@ namespace AspNetCore_MVC_Project.Controllers
         [HttpGet("companies")]
         public async Task<IActionResult> GetCompanies()
         {
-            var companies = await _context.Companies
-                .Select(c => new { c.Id, c.Name })
+            var companies = await _context.Factories
+                .Select(c => new { c.Id, c.Title })
                 .ToListAsync();
 
             return Ok(companies);
@@ -131,12 +131,12 @@ namespace AspNetCore_MVC_Project.Controllers
         /// Создает новую компанию.
         /// </summary>
         [HttpPost("companies")]
-        public async Task<IActionResult> CreateCompany([FromBody] Company company)
+        public async Task<IActionResult> CreateCompany([FromBody] Factory company)
         {
-            if (string.IsNullOrWhiteSpace(company.Name))
+            if (string.IsNullOrWhiteSpace(company.Title))
                 return BadRequest(new { message = "Название компании не может быть пустым." });
 
-            _context.Companies.Add(company);
+            _context.Factories.Add(company);
             await _context.SaveChangesAsync();
 
             // Создание базы данных компании
@@ -164,10 +164,10 @@ namespace AspNetCore_MVC_Project.Controllers
         [HttpDelete("companies/{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _context.Factories.FindAsync(id);
             if (company == null) return NotFound(new { message = "Компания не найдена." });
 
-            _context.Companies.Remove(company);
+            _context.Factories.Remove(company);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Компания успешно удалена." });
@@ -182,8 +182,8 @@ namespace AspNetCore_MVC_Project.Controllers
         public async Task<IActionResult> GetPermissions(int companyId)
         {
             var modules = await _context.Purchases
-                .Where(bm => bm.CompanyId == companyId)
-                .Select(bm => bm.NameController)
+                .Where(bm => bm.FactoryId == companyId)
+                .Select(bm => bm.OptionBlock.NameController) // Получаем NameController из OptionBlock
                 .ToListAsync();
 
             return Ok(modules);

@@ -24,11 +24,12 @@ namespace AspNetCore_MVC_Project.Middleware
             var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
             var user = await userManager.GetUserAsync(context.User);
 
-            if (user != null && user.CompanyId.HasValue)
+            if (user != null && user.FactoryId.HasValue)
             {
+                // Получаем список доступных контроллеров для компании пользователя
                 var allowedControllers = await dbContext.Purchases
-                    .Where(bm => bm.CompanyId == user.CompanyId)
-                    .Select(bm => bm.NameController)
+                    .Where(bm => bm.FactoryId == user.FactoryId)
+                    .Select(bm => bm.OptionBlock.NameController) // Теперь берём NameController из OptionBlock
                     .ToListAsync();
 
                 allowedControllers.AddRange(new[] { "Home", "Account" }); // Всегда разрешены
@@ -47,5 +48,6 @@ namespace AspNetCore_MVC_Project.Middleware
 
             await _next(context);
         }
+
     }
 }

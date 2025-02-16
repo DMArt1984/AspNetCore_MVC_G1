@@ -51,10 +51,10 @@ namespace AspNetCore_MVC_Project.Controllers
         /// <returns>Контекст базы данных компании.</returns>
         private async Task<CompanyDbContext> GetCompanyDbContext(int companyId)
         {
-            var company = await _context.Companies.FindAsync(companyId);
+            var company = await _context.Factories.FindAsync(companyId);
             if (company == null) return null;
 
-            string databaseName = $"w{company.Name.Replace(" ", "_")}";
+            string databaseName = $"w{company.Title.Replace(" ", "_")}";
             string connectionString = _configuration.GetConnectionString("CompanyDatabaseTemplate").Replace("{0}", databaseName);
             return new CompanyDbContext(connectionString);
         }
@@ -85,15 +85,15 @@ namespace AspNetCore_MVC_Project.Controllers
 
                 // Получаем пользователя
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user?.CompanyId != null)
+                if (user?.FactoryId != null)
                 {
-                    var dbContext = await GetCompanyDbContext(user.CompanyId.Value);
+                    var dbContext = await GetCompanyDbContext(user.FactoryId.Value);
                     if (dbContext != null)
                     {
                         dbContext.Database.EnsureCreated(); // Автоматически создаёт таблицы, если их нет
                         // ✅ Вместо EnsureCreated() используем Migrate() для обновления схемы
                         //dbContext.Database.Migrate();
-                        _logger.LogInformation("Синхронизация базы компании {DatabaseName} завершена", $"w{user.Company.Name}");
+                        _logger.LogInformation("Синхронизация базы компании {DatabaseName} завершена", $"w{user.Factory.Title}");
 
                         // Проверяем, есть ли таблица Mark
                         //if (!await dbContext.Marks.AnyAsync())
@@ -139,20 +139,20 @@ namespace AspNetCore_MVC_Project.Controllers
             _logger.LogInformation("Попытка регистрации пользователя {Email}", model.Email);
 
             // Проверяем, существует ли компания
-            var company = await _context.Companies.FirstOrDefaultAsync(c => c.Name == model.CompanyName);
+            var company = await _context.Factories.FirstOrDefaultAsync(c => c.Title == model.CompanyName);
             bool isNewCompany = false; // Флаг новой компании
 
             if (company == null)
             {
-                company = new Company { Name = model.CompanyName };
-                _context.Companies.Add(company);
+                company = new Factory { Title = model.CompanyName };
+                _context.Factories.Add(company);
                 await _context.SaveChangesAsync();
                 isNewCompany = true;
                 _logger.LogInformation("Создана новая компания: {CompanyName}", model.CompanyName);
             }
 
             // Создаем пользователя
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CompanyId = company.Id };
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FactoryId = company.Id };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
@@ -162,13 +162,26 @@ namespace AspNetCore_MVC_Project.Controllers
                 // Добавляем доступные модули (Business, KPI)
                 if (model.SelectedModules != null && model.SelectedModules.Any())
                 {
-                    foreach (var module in model.SelectedModules)
+                    var optionBlocks = await _context.OptionBlocks
+                        .Where(o => model.SelectedModules.Contains(o.NameController))
+                        .ToListAsync(); // Получаем все OptionBlock по именам контроллеров
+
+                    if (!optionBlocks.Any())
                     {
-                        var buyModule = new Purchase { NameController = module, CompanyId = company.Id };
-                        _context.Purchases.Add(buyModule);
+                        _logger.LogWarning("Не найдены соответствующие OptionBlocks для выбранных модулей.");
+                        return BadRequest("Некоторые или все выбранные модули не существуют.");
                     }
+
+                    var buyModules = optionBlocks.Select(optionBlock => new Purchase
+                    {
+                        OptionBlockId = optionBlock.Id, // Используем связь с OptionBlock
+                        FactoryId = company.Id
+                    }).ToList();
+
+                    _context.Purchases.AddRange(buyModules);
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("Добавлены модули для компании {CompanyName}", company.Name);
+
+                    _logger.LogInformation("Добавлены модули для компании {CompanyName}", company.Title);
                 }
 
                 // Создание базы данных компании при первой регистрации
@@ -184,7 +197,7 @@ namespace AspNetCore_MVC_Project.Controllers
                         dbContext.Marks.Add(new Mark { Title = "Service", Value = "0" });
 
                         await dbContext.SaveChangesAsync();
-                        _logger.LogInformation("База данных {DatabaseName} успешно создана", $"w{company.Name.Replace(" ", "_")}");
+                        _logger.LogInformation("База данных {DatabaseName} успешно создана", $"w{company.Title.Replace(" ", "_")}");
                     }
                 }
 

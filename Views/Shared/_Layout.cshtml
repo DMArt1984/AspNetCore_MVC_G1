@@ -9,8 +9,8 @@
     var user = await UserManager.GetUserAsync(User);
     var userModules = user != null
         ? DbContext.Purchases
-            .Where(b => b.CompanyId == user.CompanyId)
-            .Select(b => b.NameController)
+            .Where(b => b.FactoryId == user.FactoryId)
+            .Select(b => b.OptionBlock.NameController) // Теперь получаем NameController через OptionBlock
             .ToList()
         : new List<string>();
 }

@@ -11,10 +11,10 @@
 @functions {
     public async Task<string> GetCompanyName(ApplicationUser user)
     {
-        if (user?.CompanyId != null)
+        if (user?.FactoryId != null)
         {
-            var company = await DbContext.Companies.FindAsync(user.CompanyId);
-            return company?.Name ?? "No Company";
+            var company = await DbContext.Factories.FindAsync(user.FactoryId);
+            return company?.Title ?? "No Company";
         }
         return "No Company";
     }

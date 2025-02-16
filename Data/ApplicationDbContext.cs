@@ -4,17 +4,34 @@ using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
-
-        public DbSet<Company> Companies { get; set; }
+        public DbSet<Factory> Factories { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<OptionBlock> OptionBlocks { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
         {
-            base.OnModelCreating(builder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Связь "Покупка - Компания" (многие-к-одному)
+            modelBuilder.Entity<Purchase>()
+                .HasOne(p => p.Factory)
+                .WithMany()
+                .HasForeignKey(p => p.FactoryId)
+                .OnDelete(DeleteBehavior.SetNull); // Если компания удаляется, FactoryId = NULL
+
+            // Связь "Покупка - OptionBlock" (многие-к-одному)
+            modelBuilder.Entity<Purchase>()
+                .HasOne(p => p.OptionBlock)
+                .WithMany(o => o.Purchases)
+                .HasForeignKey(p => p.OptionBlockId)
+                .OnDelete(DeleteBehavior.Cascade); // Если `OptionBlock` удаляется, все связанные `Purchase` тоже удаляются
         }
     }
 }

@@ -41,20 +41,24 @@ namespace AspNetCore_MVC_Project.Controllers
         {
             // Получаем текущего пользователя
             var user = await _userManager.GetUserAsync(User);
-            if (user?.CompanyId == null) return null;
+            if (user?.FactoryId == null) return null;
 
             // Находим компанию пользователя
-            var company = await _context.Companies.FindAsync(user.CompanyId);
+            var company = await _context.Factories.FindAsync(user.FactoryId);
             if (company == null) return null;
 
             // Проверяем, есть ли у компании доступ к модулю "Business"
-            bool hasAccess = await _context.Purchases.AnyAsync(bm => bm.CompanyId == user.CompanyId && bm.NameController == "Business");
+            bool hasAccess = await _context.Purchases
+                .Include(bm => bm.OptionBlock) // Загружаем OptionBlock
+                .AnyAsync(bm => bm.FactoryId == user.FactoryId && bm.OptionBlock.NameController == "Business");
+
             if (!hasAccess) return null;
 
             // Формируем строку подключения и создаем контекст для базы данных компании
-            string connectionString = GetCompanyConnectionString($"w{company.Name.Replace(" ", "_")}");
+            string connectionString = GetCompanyConnectionString($"w{company.Title.Replace(" ", "_")}");
             return new CompanyDbContext(connectionString);
         }
+
 
         /// <summary>
         /// Отображает список данных из таблицы Job.

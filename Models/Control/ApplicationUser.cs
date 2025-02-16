@@ -12,12 +12,12 @@ namespace AspNetCore_MVC_Project.Models.Control
         /// Идентификатор компании, к которой принадлежит пользователь.
         /// Может быть null, если пользователь не привязан к конкретной компании.
         /// </summary>
-        public int? CompanyId { get; set; }
+        public int? FactoryId { get; set; }
 
         /// <summary>
         /// Навигационное свойство для связи с сущностью Company.
         /// Позволяет получить данные о компании, к которой принадлежит пользователь.
         /// </summary>
-        public virtual Company Company { get; set; }
+        public virtual Factory Factory { get; set; }
     }
 }
