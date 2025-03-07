@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using AspNetCore_MVC_Project.Models.Control;
+using AspNetCore_MVC_Project.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,9 @@ app.UseStaticFiles();
 /// Включение маршрутизации.
 /// </summary>
 app.UseRouting();
+
+// Добавление ModuleAuthorizationMiddleware
+app.UseMiddleware<ModuleAuthorizationMiddleware>();
 
 /// <summary>
 /// Включение системы аутентификации пользователей (проверка, вошел ли пользователь в систему).
