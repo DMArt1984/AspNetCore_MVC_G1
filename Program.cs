@@ -4,6 +4,7 @@ using AspNetCore_MVC_Project.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using AspNetCore_MVC_Project.Models.Control;
 using AspNetCore_MVC_Project.Middleware;
+using AspNetCore_MVC_Project.Areas.BOX.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,10 @@ builder.Logging.AddConsole(); // Логи будут видны в консол�
 /// </summary>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var connectionCompanyMigrationString = builder.Configuration.GetConnectionString("CompanyDatabaseMigration");
+
+//
+builder.Services.AddDbContext<BoxDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("BOXConnection")));
 
 /// <summary>
 /// Добавление сервиса DbContext с использованием SQL Server.
@@ -114,7 +119,7 @@ app.UseAuthorization();
 app.MapAreaControllerRoute(
     name: "HelloRoute",
     areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
-    pattern: "hello",          // Тот URL, который вы хотите
+    pattern: "hello",          // Тот URL, который нужен
     defaults: new { controller = "Market", action = "Index" }
 );
 
@@ -127,7 +132,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Создание базы и таблиц, если их еще нет
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BoxDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 /// <summary>
 /// Запуск веб-приложения.
 /// </summary>
 app.Run();
+
