@@ -109,6 +109,15 @@ app.UseAuthorization();
 /// Используется маршрут по умолчанию, который указывает, что начальной страницей будет "Home/Index".
 /// </summary>
 /// 
+
+// Кастомная адресация
+app.MapAreaControllerRoute(
+    name: "HelloRoute",
+    areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
+    pattern: "hello",          // Тот URL, который вы хотите
+    defaults: new { controller = "Market", action = "Index" }
+);
+
 // Маршрутизация для областей (Areas)
 app.MapControllerRoute(
     name: "areas",
