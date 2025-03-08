@@ -26,6 +26,8 @@
 
   <ItemGroup>
     <Folder Include="Areas\BOX\Views\Shared\" />
+    <Folder Include="Areas\CUBE\Data\" />
+    <Folder Include="Areas\CUBE\Models\" />
   </ItemGroup>
 
 </Project>
