@@ -108,6 +108,12 @@ app.UseAuthorization();
 /// Настройка маршрутов контроллеров.
 /// Используется маршрут по умолчанию, который указывает, что начальной страницей будет "Home/Index".
 /// </summary>
+/// 
+// Маршрутизация для областей (Areas)
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+// Маршрутизация по умолчанию
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
