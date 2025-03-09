@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Authorization; // Пространство имён, 
 
 namespace AspNetCore_MVC_Project.Areas.BOX.Controllers
 {
-
+    [Area("BOX")] // Обязательно
+    [AllowAnonymous] // Разрешаем анонимный доступ ко всему контроллеру
     public class ToiRController : Controller
     {
 
