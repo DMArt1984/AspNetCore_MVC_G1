@@ -31,7 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\BOX\Data\" />
+    <Folder Include="Areas\CUBE\Data\" />
+    <Folder Include="Areas\CUBE\Models\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\js\" />
     <Folder Include="wwwroot\template2\" />
