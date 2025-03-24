@@ -14,6 +14,7 @@ namespace AspNetCore_MVC_Project.Controllers
     /// ќтвечает за доступ пользователей к данным таблицы Statistic.
     /// </summary>
     [Authorize] // ќграничивает доступ только дл€ авторизованных пользователей
+    [ModuleAuthorize("KPI")] // ќграничивает доступ к модулю
     public class KPIController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;

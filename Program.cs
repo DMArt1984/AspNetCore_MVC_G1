@@ -119,26 +119,26 @@ app.UseAuthorization();
 /// 
 
 // Кастомная адресация
-app.MapAreaControllerRoute(
-    name: "HelloRoute",
-    areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
-    pattern: "hello",          // Тот URL, который нужен
-    defaults: new { controller = "Market", action = "Index" }
-);
+//app.MapAreaControllerRoute(
+//    name: "HelloRoute",
+//    areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
+//    pattern: "hello",          // Тот URL, который нужен
+//    defaults: new { controller = "Market", action = "Index" }
+//);
 
 // tenant
-app.MapControllerRoute(
-    name: "CUBEWithTenant",
-    pattern: "CUBE/{tenant}/{controller=Warehouse}/{action=Index}/{id?}",
-    defaults: new { area = "CUBE" }
-);
+//app.MapControllerRoute(
+//    name: "CUBEWithTenant",
+//    pattern: "CUBE/{tenant}/{controller=Warehouse}/{action=Index}/{id?}",
+//    defaults: new { area = "CUBE" }
+//);
 
 // Если в CUBE нет контроллера Home
-app.MapControllerRoute(
-    name: "cube_default",
-    pattern: "CUBE/{controller=Warehouse}/{action=Index}/{id?}",
-    defaults: new { area = "CUBE" }
-);
+//app.MapControllerRoute(
+//    name: "cube_default",
+//    pattern: "CUBE/{controller=Warehouse}/{action=Index}/{id?}",
+//    defaults: new { area = "CUBE" }
+//);
 
 // Маршрутизация для областей (Areas)
 app.MapControllerRoute(
