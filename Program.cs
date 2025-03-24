@@ -96,12 +96,6 @@ app.UseStaticFiles();
 /// </summary>
 app.UseRouting();
 
-// Добавление ModuleAuthorizationMiddleware
-app.UseMiddleware<ModuleAuthorizationMiddleware>();
-
-//
-app.UseMiddleware<TenantResolutionMiddleware>();
-
 /// <summary>
 /// Включение системы аутентификации пользователей (проверка, вошел ли пользователь в систему).
 /// </summary>
@@ -111,6 +105,14 @@ app.UseAuthentication();
 /// Включение системы авторизации (проверка прав пользователя на доступ к определенным ресурсам).
 /// </summary>
 app.UseAuthorization();
+
+
+// Добавление ModuleAuthorizationMiddleware
+app.UseMiddleware<ModuleAuthorizationMiddleware>();
+
+//
+app.UseMiddleware<TenantResolutionMiddleware>();
+
 
 /// <summary>
 /// Настройка маршрутов контроллеров.

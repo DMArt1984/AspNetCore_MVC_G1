@@ -8,6 +8,7 @@
 @inject ApplicationDbContext DbContext
 
 @{
+    // 1 ВАРИАНТ (определяем доступ здесь и сейчас)
     // Получаем текущего пользователя
     var user = await UserManager.GetUserAsync(User);
 
@@ -18,6 +19,11 @@
             .Select(b => b.OptionBlock.NameController) // Теперь получаем NameController через OptionBlock
             .ToList()
         : new List<string>(); // Если пользователь не авторизован, создаем пустой список
+
+    // 2 ВАРИАНТ (получаем заранее подготовленный список разрешенных контроллеров)
+    // Пытаемся получить список разрешённых контроллеров, который можно установить в Middleware
+    var allowedControllers = Context.Items["AllowedControllers"] as List<string> ?? new List<string> { "Home", "Account", "Market", "Warehouse" };
+    bool next = true;
 }
 
 <!-- -->
@@ -47,6 +53,7 @@
                 <!-- Основное меню навигации -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
+                        <!-- 1 ВАРИАНТ -->
                         <!-- Проверяем, есть ли у пользователя доступ к модулю "Business" -->
                         @if (userModules.Contains("Business"))
                         {
@@ -61,6 +68,19 @@
                                 <a class="nav-link" asp-controller="KPI" asp-action="Index">KPI</a>
                             </li>
                         }
+
+                        <!-- 2 ВАРИАНТ -->
+                        <!-- Ссылки для области BOX -->
+                        @if (allowedControllers.Contains("Market"))
+                        {
+                            <li class="nav-item">@Html.ActionLink("Market (BOX)", "Index", "Market", new { area = "BOX" }, new { @class = "nav-link" })</li>
+                        }
+                        <!-- Ссылки для области CUBE -->
+                        @if (allowedControllers.Contains("Warehouse"))
+                        {
+                            <li class="nav-item">@Html.ActionLink("Warehouse (CUBE)", "Index", "Warehouse", new { area = "CUBE" }, new { @class = "nav-link" })</li>
+                        }
+
                     </ul>
 
                     <!-- Кнопка "Настроить доступ" видна только авторизованным пользователям -->

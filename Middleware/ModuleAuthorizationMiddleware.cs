@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Middleware
@@ -43,11 +40,14 @@ namespace AspNetCore_MVC_Project.Middleware
                 // Получаем список разрешённых контроллеров для компании пользователя
                 var allowedControllers = await dbContext.Purchases
                     .Where(bm => bm.FactoryId == user.FactoryId)
-                    .Select(bm => bm.OptionBlock.NameController) // Теперь берём NameController из OptionBlock
+                    .Select(bm => bm.OptionBlock.NameController) // Получаем имя контроллера из OptionBlock
                     .ToListAsync();
 
                 // Разрешаем доступ к главной странице и странице входа/регистрации по умолчанию
-                allowedControllers.AddRange(new[] { "Home", "Account" });
+                allowedControllers.AddRange(new[] { "Home", "Account", "Admin" });
+
+                // Сохраняем список разрешённых контроллеров в HttpContext для дальнейшего использования
+                context.Items["AllowedControllers"] = allowedControllers;
 
                 // Получаем маршрут текущего запроса (какой контроллер вызывается)
                 var routeValues = context.GetRouteData().Values;
