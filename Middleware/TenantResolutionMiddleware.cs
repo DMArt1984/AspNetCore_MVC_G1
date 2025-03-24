@@ -10,11 +10,9 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // Предположим, что URL выглядит как: https://localhost:64820/Apple/...
-
+            // Предположим, что URL выглядит как: https://localhost:64820/CUBE/Apple/...
             // Разбиваем путь запроса на сегменты
             var segments = context.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
             // Проверяем, что первый сегмент равен "CUBE"
             if (segments.Length > 0 && segments[0].Equals("CUBE", StringComparison.OrdinalIgnoreCase))
             {
@@ -28,10 +26,7 @@
                     }
                 }
             }
-
             await _next(context);
         }
-
-
     }
 }

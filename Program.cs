@@ -121,21 +121,21 @@ app.UseMiddleware<TenantResolutionMiddleware>();
 /// 
 
 // Кастомная адресация
-//app.MapAreaControllerRoute(
-//    name: "HelloRoute",
-//    areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
-//    pattern: "hello",          // Тот URL, который нужен
-//    defaults: new { controller = "Market", action = "Index" }
-//);
+app.MapAreaControllerRoute(
+    name: "HelloRoute",
+    areaName: "BOX",           // Имя области должно совпадать с [Area("BOX")] в контроллере
+    pattern: "hello",          // Тот URL, который нужен
+    defaults: new { controller = "Market", action = "Index" }
+);
 
-// tenant
-//app.MapControllerRoute(
-//    name: "CUBEWithTenant",
-//    pattern: "CUBE/{tenant}/{controller=Warehouse}/{action=Index}/{id?}",
-//    defaults: new { area = "CUBE" }
-//);
+// tenant (используется для централизованного определения идентификатора арендатора)
+app.MapControllerRoute(
+    name: "CUBEWithTenant",
+    pattern: "CUBE/{tenant}/{controller=Warehouse}/{action=Index}/{id?}",
+    defaults: new { area = "CUBE" }
+);
 
-// Если в CUBE нет контроллера Home
+// Если в CUBE нет контроллера Home (требуется доработать если будем применять!)
 //app.MapControllerRoute(
 //    name: "cube_default",
 //    pattern: "CUBE/{controller=Warehouse}/{action=Index}/{id?}",

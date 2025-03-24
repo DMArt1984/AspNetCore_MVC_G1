@@ -44,7 +44,7 @@ namespace AspNetCore_MVC_Project.Middleware
                     .ToListAsync();
 
                 // Разрешаем доступ к главной странице и странице входа/регистрации по умолчанию
-                allowedControllers.AddRange(new[] { "Home", "Account", "Admin" });
+                allowedControllers.AddRange(new[] { "Home", "Account", "Admin" }); // доступность Admin - это временное решение
 
                 // Сохраняем список разрешённых контроллеров в HttpContext для дальнейшего использования
                 context.Items["AllowedControllers"] = allowedControllers;
