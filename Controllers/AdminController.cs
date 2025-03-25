@@ -82,7 +82,7 @@ public class AdminController : Controller
             _context.Purchases.AddRange(newOptions); // Добавляем новые записи
         }
 
-        await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
+        await _context.SaveChangesAsync(); // Сохраняем изменения в БД
 
         // Перенаправляем пользователя обратно на страницу управления модулями для данной компании
         return RedirectToAction("ManageOptions", new { factoryId = model.FactoryId });

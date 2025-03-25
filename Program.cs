@@ -16,7 +16,7 @@ builder.Logging.AddConsole(); // Логи будут видны в консол�
 
 /// <summary>
 /// Получение строки подключения из файла конфигурации appsettings.json.
-/// "DefaultConnection" используется для подключения к основной базе данных.
+/// "DefaultConnection" используется для подключения к основной БД.
 /// </summary>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var connectionCompanyMigrationString = builder.Configuration.GetConnectionString("CompanyDatabaseMigration");

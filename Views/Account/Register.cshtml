@@ -33,8 +33,31 @@
 
     <div class="form-group">
         <label>Select Available Modules:</label><br />
-        <input type="checkbox" name="SelectedModules" value="Business" /> Business<br />
-        <input type="checkbox" name="SelectedModules" value="KPI" /> KPI<br />
+        @if (Model.AvailableModules != null && Model.AvailableModules.Any())
+        {
+            foreach (var module in Model.AvailableModules)
+            {
+                // Если NameController не задан, используем NameArea для отображения названия модуля
+                var displayName = !string.IsNullOrEmpty(module.NameController) ? module.NameController : module.NameArea;
+                <div class="form-check">
+                    <input type="checkbox" name="SelectedModules" value="@module.Id" class="form-check-input"
+                    @(Model.SelectedModules != null && Model.SelectedModules.Contains(module.Id) ? "checked" : "") />
+                    <label class="form-check-label">@displayName</label>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Если список AvailableModules не передан, используются статические значения -->
+            <div class="form-check">
+                <input type="checkbox" name="SelectedModules" value="Business" class="form-check-input" />
+                <label class="form-check-label">Business</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="SelectedModules" value="KPI" class="form-check-input" />
+                <label class="form-check-label">KPI</label>
+            </div>
+        }
     </div>
 
     <button type="submit" class="btn btn-primary">Register</button>

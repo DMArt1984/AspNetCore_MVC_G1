@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using AspNetCore_MVC_Project.Models;
 using AspNetCore_MVC_Project.ViewModels;
 using AspNetCore_MVC_Project.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Models.Control;
 using AspNetCore_MVC_Project.Models.Factory;
@@ -91,7 +87,7 @@ namespace AspNetCore_MVC_Project.Controllers
                     if (dbContext != null)
                     {
                         dbContext.Database.EnsureCreated(); // Автоматически создает таблицы, если их нет
-                        // ✅ Вместо EnsureCreated() используем Migrate() для обновления схемы
+                        // Вместо EnsureCreated() используем Migrate() для обновления схемы
                         //dbContext.Database.Migrate();
                         _logger.LogInformation("Синхронизация базы компании {DatabaseName} завершена", $"w{user.Factory.Title}");
 
@@ -113,7 +109,7 @@ namespace AspNetCore_MVC_Project.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            ModelState.AddModelError(string.Empty, "Неверная попытка входа");
             return View(model);
         }
 
@@ -121,7 +117,12 @@ namespace AspNetCore_MVC_Project.Controllers
         /// <summary>
         /// Возвращает страницу регистрации.
         /// </summary>
-        public IActionResult Register() => View();
+        public async Task<IActionResult> Register()
+        {
+            var model = new RegisterViewModel();
+            model.AvailableModules = await _context.OptionBlocks.ToListAsync();
+            return View(model);
+        }
 
         /// <summary>
         /// Обрабатывает регистрацию нового пользователя.
@@ -152,29 +153,36 @@ namespace AspNetCore_MVC_Project.Controllers
             }
 
             // Создаем пользователя
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FactoryId = company.Id };
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FactoryId = company.Id
+            };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
                 _logger.LogInformation("Пользователь {Email} успешно создан", model.Email);
 
-                // Добавляем доступные модули (Business, KPI)
+                // Добавляем доступные модули (Business, KPI и т.д.) по идентификаторам OptionBlock
                 if (model.SelectedModules != null && model.SelectedModules.Any())
                 {
+                    // Выполняем выборку OptionBlock из базы по списку идентификаторов
                     var optionBlocks = await _context.OptionBlocks
-                        .Where(o => model.SelectedModules.Contains(o.NameController))
-                        .ToListAsync(); // Получаем все OptionBlock по именам контроллеров
+                        .Where(o => model.SelectedModules.Contains(o.Id))
+                        .ToListAsync();
 
                     if (!optionBlocks.Any())
                     {
-                        _logger.LogWarning("Не найдены соответствующие OptionBlocks для выбранных модулей.");
+                        _logger.LogWarning("Не найдены соответствующие OptionBlocks для выбранных модулей (IDs).");
                         return BadRequest("Некоторые или все выбранные модули не существуют.");
                     }
 
+                    // Создаем записи в таблице Purchases, связывая модули с компанией
                     var buyModules = optionBlocks.Select(optionBlock => new Purchase
                     {
-                        OptionBlockId = optionBlock.Id, // Используем связь с OptionBlock
+                        OptionBlockId = optionBlock.Id, // Связь с OptionBlock по Id
                         FactoryId = company.Id
                     }).ToList();
 
@@ -205,6 +213,7 @@ namespace AspNetCore_MVC_Project.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Если создание пользователя не удалось, показываем ошибки
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
@@ -213,6 +222,8 @@ namespace AspNetCore_MVC_Project.Controllers
 
             return View(model);
         }
+
+
 
         /// <summary>
         /// Обрабатывает выход пользователя из системы.

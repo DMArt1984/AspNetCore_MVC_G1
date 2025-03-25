@@ -27,7 +27,7 @@ namespace AspNetCore_MVC_Project.Controllers
         /// Метод получает строку подключения для базы данных компании.
         /// </summary>
         /// <param name="databaseName">Название базы данных компании.</param>
-        /// <returns>Форматированная строка подключения к базе данных.</returns>
+        /// <returns>Форматированная строка подключения к БД.</returns>
         protected string GetCompanyConnectionString(string databaseName)
         {
             // Получаем шаблон строки подключения из appsettings.json

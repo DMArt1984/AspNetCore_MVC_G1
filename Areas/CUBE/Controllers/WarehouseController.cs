@@ -10,7 +10,7 @@ namespace AspNetCore_MVC_Project.Areas.CUBE.Controllers
         public IActionResult Index()
         {
             // Получаем из class TenantResolutionMiddleware
-            // Предполагаем, что TenantId - это строка
+            // TenantId - это строка
             var tenantId = HttpContext.Items["TenantId"] as string;
             if (!string.IsNullOrEmpty(tenantId))
             {

@@ -87,7 +87,7 @@ namespace AspNetCore_MVC_Project.Data
         }
 
         /// <summary>
-        /// Проверяет, существует ли таблица в базе данных.
+        /// Проверяет, существует ли таблица в БД.
         /// </summary>
         private bool TableExists(string tableName)
         {

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.ViewModels
 {
@@ -43,11 +44,16 @@ namespace AspNetCore_MVC_Project.ViewModels
         public string CompanyName { get; set; }
 
         /// <summary>
-        /// Список модулей (контроллеров), доступных пользователю после регистрации.
-        /// Выбирается пользователем при регистрации.
+        /// Список идентификаторов модулей, выбранных пользователем при регистрации.
+        /// Каждый идентификатор соответствует записи в OptionBlock.Id.
         /// </summary>
         [Display(Name = "Select Modules")]
-        public List<string> SelectedModules { get; set; }
+        public List<int> SelectedModules { get; set; } = new List<int>();
+
+        /// <summary>
+        /// Опциональное свойство для отображения списка доступных модулей (OptionBlock) в представлении.
+        /// Если нужно динамически вывести чекбоксы или другой интерфейс выбора модулей.
+        /// </summary>
+        public List<OptionBlock> AvailableModules { get; set; } = new List<OptionBlock>();
     }
 }
-
