@@ -142,10 +142,16 @@ app.MapControllerRoute(
 //    defaults: new { area = "CUBE" }
 //);
 
+// ---
+// Используем динамическую маршрутизацию с преобразователем AreaTransformer
+//app.MapDynamicControllerRoute<AreaTransformer>("{controller}/{action=Index}/{id?}");
+
 // Маршрутизация для областей (Areas)
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+// ---
+
 // Маршрутизация по умолчанию
 app.MapControllerRoute(
     name: "default",
