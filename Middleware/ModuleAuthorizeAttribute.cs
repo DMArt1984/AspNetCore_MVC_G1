@@ -17,7 +17,7 @@ public class ModuleAuthorizeAttribute : Attribute, IAsyncActionFilter
     private readonly string _moduleName;
 
     /// <summary>
-    /// Создаёт атрибут с указанием имени модуля (контроллера), к которому должен быть доступ.
+    /// Создает атрибут с указанием имени модуля (контроллера), к которому должен быть доступ.
     /// </summary>
     /// <param name="moduleName">Имя контроллера, соответствующее значению OptionBlock.NameController</param>
     public ModuleAuthorizeAttribute(string moduleName)
@@ -66,7 +66,7 @@ public class ModuleAuthorizeAttribute : Attribute, IAsyncActionFilter
             return;
         }
 
-        // Всё в порядке — передаём выполнение дальше
+        // Все в порядке — передаем выполнение дальше
         await next();
     }
 }

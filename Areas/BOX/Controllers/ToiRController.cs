@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AspNetCore_MVC_Project.Data;
-using Microsoft.AspNetCore.Authorization; // Пространство имён, где определён CompanyDbContext
+using Microsoft.AspNetCore.Authorization; // Пространство имен, где определен CompanyDbContext
 
 namespace AspNetCore_MVC_Project.Areas.BOX.Controllers
 {

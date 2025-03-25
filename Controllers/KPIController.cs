@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AspNetCore_MVC_Project.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 using AspNetCore_MVC_Project.Models.Control;
 
 namespace AspNetCore_MVC_Project.Controllers
@@ -14,7 +12,7 @@ namespace AspNetCore_MVC_Project.Controllers
     /// Отвечает за доступ пользователей к данным таблицы Statistic.
     /// </summary>
     [Authorize] // Ограничивает доступ только для авторизованных пользователей
-    [ModuleAuthorize("KPI")] // Ограничивает доступ к модулю
+    [ModuleAuthorize("KPI")] // Ограничивает доступ к модулю KPI
     public class KPIController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -35,7 +33,7 @@ namespace AspNetCore_MVC_Project.Controllers
 
         /// <summary>
         /// Получает контекст базы данных компании.
-        /// Проверяет, есть ли у пользователя доступ к модулю "KPI".
+        /// Проверяет, есть ли у пользователя доступ к модулю "KPI" с учетом области.
         /// </summary>
         /// <returns>Контекст базы данных компании или null, если доступ запрещен.</returns>
         private async Task<CompanyDbContext> GetCompanyDbContext()
@@ -49,17 +47,21 @@ namespace AspNetCore_MVC_Project.Controllers
             if (company == null) return null;
 
             // Проверяем, есть ли у компании доступ к модулю "KPI"
+            // Для доступа необходимо, чтобы был назначен модуль, у которого NameController == "KPI"
+            // и если NameArea задан, то он также должен равняться "KPI".
             bool hasAccess = await _context.Purchases
-                .Include(bm => bm.OptionBlock) // Загружаем OptionBlock
-                .AnyAsync(bm => bm.FactoryId == user.FactoryId && bm.OptionBlock.NameController == "KPI");
+                .Include(bm => bm.OptionBlock) // Загружаем связанные данные OptionBlock
+                .AnyAsync(bm => bm.FactoryId == user.FactoryId &&
+                                 bm.OptionBlock.NameController == "KPI" &&
+                                 (string.IsNullOrEmpty(bm.OptionBlock.NameArea) || bm.OptionBlock.NameArea == "KPI"));
 
             if (!hasAccess) return null;
 
-            // Формируем строку подключения и создаем контекст для базы данных компании
+            // Формируем строку подключения и создаем контекст для базы данных компании.
+            // Здесь используется название компании для формирования уникальной строки подключения.
             string connectionString = GetCompanyConnectionString($"w{company.Title.Replace(" ", "_")}");
             return new CompanyDbContext(connectionString);
         }
-
 
         /// <summary>
         /// Отображает список данных из таблицы Statistic.
@@ -70,7 +72,8 @@ namespace AspNetCore_MVC_Project.Controllers
         {
             // Получаем контекст базы данных компании
             var dbContext = await GetCompanyDbContext();
-            if (dbContext == null) return RedirectToAction("Index", "Home"); // Если доступа нет – перенаправляем на главную страницу
+            if (dbContext == null)
+                return RedirectToAction("Index", "Home"); // Если доступа нет – перенаправляем на главную страницу
 
             // Загружаем все записи из таблицы Statistic
             var statistics = await dbContext.Statistics.ToListAsync();
@@ -78,3 +81,4 @@ namespace AspNetCore_MVC_Project.Controllers
         }
     }
 }
+

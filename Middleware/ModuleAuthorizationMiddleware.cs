@@ -7,7 +7,8 @@ using AspNetCore_MVC_Project.Models.Control;
 namespace AspNetCore_MVC_Project.Middleware
 {
     /// <summary>
-    /// Промежуточное ПО (Middleware) для проверки прав доступа к контроллерам в зависимости от разрешённых модулей компании.
+    /// Промежуточное ПО (Middleware) для проверки прав доступа к контроллерам и областям
+    /// в зависимости от разрешенных модулей компании.
     /// </summary>
     public class ModuleAuthorizationMiddleware
     {
@@ -22,7 +23,7 @@ namespace AspNetCore_MVC_Project.Middleware
         }
 
         /// <summary>
-        /// Метод обработки HTTP-запроса. Проверяет доступ к контроллерам перед их выполнением.
+        /// Метод обработки HTTP-запроса. Проверяет, имеет ли текущий пользователь доступ к заданной паре Area/Controller.
         /// </summary>
         /// <param name="context">Текущий HTTP-контекст</param>
         public async Task Invoke(HttpContext context)
@@ -34,29 +35,76 @@ namespace AspNetCore_MVC_Project.Middleware
             // Получаем текущего пользователя
             var user = await userManager.GetUserAsync(context.User);
 
-            // Проверяем, есть ли у пользователя привязанная компания
+            // Если пользователь аутентифицирован и у него задан FactoryId
             if (user != null && user.FactoryId.HasValue)
             {
-                // Получаем список разрешённых контроллеров для компании пользователя
-                var allowedControllers = await dbContext.Purchases
-                    .Where(bm => bm.FactoryId == user.FactoryId)
-                    .Select(bm => bm.OptionBlock.NameController) // Получаем имя контроллера из OptionBlock
+                // Получаем список разрешенных модулей для компании пользователя.
+                // Здесь для каждого элемента выбирается пара (Controller, Area) из связанной сущности OptionBlock.
+                // Если OptionBlock.NameArea хранит название области, то оно будет использоваться для проверки.
+                var allowedModules = await dbContext.Purchases
+                    .Where(p => p.FactoryId == user.FactoryId)
+                    .Select(p => new {
+                        Controller = p.OptionBlock.NameController,
+                        Area = p.OptionBlock.NameArea
+                    })
                     .ToListAsync();
 
-                // Разрешаем доступ к главной странице и странице входа/регистрации по умолчанию
-                allowedControllers.AddRange(new[] { "Home", "Account", "Admin" }); // доступность Admin - это временное решение
+                // Добавляем стандартные контроллеры, доступ к которым разрешен вне зависимости от области.
+                // При этом Area оставляем null или пустой, чтобы проверка разрешала доступ независимо от области.
+                allowedModules.Add(new { Controller = "Home", Area = (string)null });
+                allowedModules.Add(new { Controller = "Account", Area = (string)null });
+                allowedModules.Add(new { Controller = "Admin", Area = (string)null }); // временное решение для Admin
 
-                // Сохраняем список разрешённых контроллеров в HttpContext для дальнейшего использования
-                context.Items["AllowedControllers"] = allowedControllers;
+                // Сохраняем список разрешенных модулей в HttpContext для дальнейшего использования (например, для формирования меню)
+                context.Items["AllowedControllers"] = allowedModules;
 
-                // Получаем маршрут текущего запроса (какой контроллер вызывается)
+                // Получаем текущие значения маршрута из RouteData
                 var routeValues = context.GetRouteData().Values;
+
                 if (routeValues.ContainsKey("controller"))
                 {
                     var controllerName = routeValues["controller"].ToString();
+                    // Если в маршруте не указана область, считаем ее пустой
+                    var areaName = routeValues.ContainsKey("area") ? routeValues["area"].ToString() : string.Empty;
 
-                    // Если у пользователя нет доступа к этому контроллеру, перенаправляем его на главную страницу
-                    if (!allowedControllers.Contains(controllerName))
+                    // Проверяем, разрешен ли доступ на основе списка разрешенных модулей.
+                    // Логика следующая:
+                    // 1. Если разрешенный модуль указывает только область (Controller пустой, Area задана),
+                    //    то доступ разрешается, если в маршруте указана совпадающая область.
+                    // 2. Если разрешенный модуль указывает как контроллер, так и область,
+                    //    то проверяем, что оба совпадают с параметрами маршрута.
+                    // 3. Если разрешенный модуль не задает область (Area пустая), но задает контроллер,
+                    //    то проверяем только контроллер.
+                    bool allowed = allowedModules.Any(m =>
+                    {
+                        string allowedController = m.Controller as string;
+                        string allowedArea = m.Area as string;
+
+                        // Вариант 1: Только область задана
+                        if (string.IsNullOrWhiteSpace(allowedController) && !string.IsNullOrWhiteSpace(allowedArea))
+                        {
+                            return string.Equals(allowedArea, areaName, StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        // Вариант 2: Оба поля заданы
+                        if (!string.IsNullOrWhiteSpace(allowedController) && !string.IsNullOrWhiteSpace(allowedArea))
+                        {
+                            return string.Equals(allowedController, controllerName, StringComparison.OrdinalIgnoreCase)
+                                   && string.Equals(allowedArea, areaName, StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        // Вариант 3: Задан только контроллер (область не указана в разрешениях)
+                        if (!string.IsNullOrWhiteSpace(allowedController) && string.IsNullOrWhiteSpace(allowedArea))
+                        {
+                            return string.Equals(allowedController, controllerName, StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        // Если ни контроллер, ни область не заданы — считаем, что это невалидная запись
+                        return false;
+                    });
+
+                    // Если доступа к указанной паре (Area/Controller) нет, перенаправляем пользователя на главную страницу.
+                    if (!allowed)
                     {
                         context.Response.Redirect("/Home/Index");
                         return; // Прерываем выполнение запроса
@@ -64,9 +112,8 @@ namespace AspNetCore_MVC_Project.Middleware
                 }
             }
 
-            // Передаём управление следующему Middleware в конвейере
+            // Передаем управление следующему Middleware в конвейере
             await _next(context);
         }
     }
 }
-

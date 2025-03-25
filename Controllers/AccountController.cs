@@ -90,7 +90,7 @@ namespace AspNetCore_MVC_Project.Controllers
                     var dbContext = await GetCompanyDbContext(user.FactoryId.Value);
                     if (dbContext != null)
                     {
-                        dbContext.Database.EnsureCreated(); // Автоматически создаёт таблицы, если их нет
+                        dbContext.Database.EnsureCreated(); // Автоматически создает таблицы, если их нет
                         // ✅ Вместо EnsureCreated() используем Migrate() для обновления схемы
                         //dbContext.Database.Migrate();
                         _logger.LogInformation("Синхронизация базы компании {DatabaseName} завершена", $"w{user.Factory.Title}");
@@ -98,7 +98,7 @@ namespace AspNetCore_MVC_Project.Controllers
                         // Проверяем, есть ли таблица Mark
                         //if (!await dbContext.Marks.AnyAsync())
                         //{
-                        //    _logger.LogInformation("Создаётся таблица Mark для компании {DatabaseName}", $"w{user.Company.Name}");
+                        //    _logger.LogInformation("Создается таблица Mark для компании {DatabaseName}", $"w{user.Company.Name}");
 
                         //    // Добавляем записи в таблицу Mark
                         //    dbContext.Marks.Add(new Mark { Title = "Creator", Value = user.UserName });
@@ -190,7 +190,7 @@ namespace AspNetCore_MVC_Project.Controllers
                     var dbContext = await GetCompanyDbContext(company.Id);
                     if (dbContext != null)
                     {
-                        dbContext.Database.EnsureCreated(); // Создаём базу
+                        dbContext.Database.EnsureCreated(); // Создаем базу
 
                         // Добавляем записи в таблицу Mark
                         dbContext.Marks.Add(new Mark { Title = "Creator", Value = user.UserName });

@@ -33,7 +33,7 @@ namespace AspNetCore_MVC_Project.Data
         public DbSet<Mark> Marks { get; set; }
 
         /// <summary>
-        /// Проверяет и создаёт таблицы, которых ещё нет.
+        /// Проверяет и создает таблицы, которых еще нет.
         /// </summary>
         public void EnsureTablesCreated()
         {
@@ -42,7 +42,7 @@ namespace AspNetCore_MVC_Project.Data
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
 
-                // Проверяем и создаём таблицу Jobs
+                // Проверяем и создаем таблицу Jobs
                 var checkJobs = new NpgsqlCommand(@"
                     CREATE TABLE IF NOT EXISTS Jobs (
                         Id SERIAL PRIMARY KEY, 
@@ -51,7 +51,7 @@ namespace AspNetCore_MVC_Project.Data
                     )", connection);
                 checkJobs.ExecuteNonQuery();
 
-                // Проверяем и создаём таблицу Statistics
+                // Проверяем и создаем таблицу Statistics
                 var checkStatistics = new NpgsqlCommand(@"
                     CREATE TABLE IF NOT EXISTS Statistics (
                         Id SERIAL PRIMARY KEY, 
@@ -62,7 +62,7 @@ namespace AspNetCore_MVC_Project.Data
                     )", connection);
                 checkStatistics.ExecuteNonQuery();
 
-                // Проверяем и создаём таблицу Marks
+                // Проверяем и создаем таблицу Marks
                 var checkMarks = new NpgsqlCommand(@"
                     CREATE TABLE IF NOT EXISTS Marks (
                         Id SERIAL PRIMARY KEY, 

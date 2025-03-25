@@ -144,7 +144,7 @@ namespace AspNetCore_MVC_Project.Controllers
             if (dbContext == null)
                 return BadRequest(new { message = "Ошибка при создании базы компании." });
 
-            dbContext.Database.EnsureCreated(); // Создаём базу
+            dbContext.Database.EnsureCreated(); // Создаем базу
 
             // Добавляем записи в таблицу Mark
             var user = await _userManager.GetUserAsync(User);

@@ -19,7 +19,7 @@
         if (user?.FactoryId != null) // Проверяем, есть ли у пользователя привязанная компания
         {
             var company = await DbContext.Factories.FindAsync(user.FactoryId); // Ищем компанию в базе данных
-            return company?.Title ?? "No Company"; // Если компания найдена, возвращаем её название, иначе "No Company"
+            return company?.Title ?? "No Company"; // Если компания найдена, возвращаем ее название, иначе "No Company"
         }
         return "No Company"; // Если у пользователя нет компании, возвращаем "No Company"
     }

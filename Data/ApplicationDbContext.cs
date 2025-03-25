@@ -12,22 +12,22 @@ namespace AspNetCore_MVC_Project.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         /// <summary>
-        /// Таблица компаний (фабрик).
+        /// Таблица компаний (фабрик)
         /// </summary>
         public DbSet<Factory> Factories { get; set; }
 
         /// <summary>
-        /// Таблица покупок (разрешений на модули).
+        /// Таблица покупок (разрешений на модули)
         /// </summary>
         public DbSet<Purchase> Purchases { get; set; }
 
         /// <summary>
-        /// Таблица модулей (опциональных блоков).
+        /// Таблица модулей (опциональных блоков)
         /// </summary>
         public DbSet<OptionBlock> OptionBlocks { get; set; }
 
         /// <summary>
-        /// Конструктор контекста базы данных.
+        /// Конструктор контекста базы данных
         /// </summary>
         /// <param name="options">Настройки для подключения к БД.</param>
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

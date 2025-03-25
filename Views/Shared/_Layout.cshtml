@@ -2,6 +2,7 @@
 @using AspNetCore_MVC_Project.Models
 @using AspNetCore_MVC_Project.Models.Control
 @using Microsoft.AspNetCore.Identity
+@using System.Linq
 
 <!-- Внедрение зависимостей для управления пользователями и работы с БД -->
 @inject UserManager<ApplicationUser> UserManager
@@ -12,21 +13,33 @@
     // Получаем текущего пользователя
     var user = await UserManager.GetUserAsync(User);
 
-    // Определяем список доступных модулей для текущего пользователя
+    // Определяем список доступных модулей для текущего пользователя.
+    // Теперь формируем коллекцию объектов, где для каждого модуля сохраняются:
+    // - Controller: имя контроллера, полученное через OptionBlock
+    // - Area: имя области, полученное через OptionBlock (если оно задано)
     var userModules = user != null
         ? DbContext.Purchases
             .Where(b => b.FactoryId == user.FactoryId)
-            .Select(b => b.OptionBlock.NameController) // Теперь получаем NameController через OptionBlock
+            .Select(b => (dynamic)new
+            {
+                Controller = b.OptionBlock.NameController,
+                Area = b.OptionBlock.NameArea
+            })
             .ToList()
-        : new List<string>(); // Если пользователь не авторизован, создаем пустой список
+        : new List<dynamic>(); // Если пользователь не авторизован, создаем пустой список
 
-    // 2 ВАРИАНТ (получаем заранее подготовленный список разрешенных контроллеров)
-    // Пытаемся получить список разрешённых контроллеров, который можно установить в Middleware
-    var allowedControllers = Context.Items["AllowedControllers"] as List<string> ?? new List<string> { "Home", "Account", "Market", "Warehouse" };
-    bool next = true;
+    // 2 ВАРИАНТ (получаем заранее подготовленный список разрешенных модулей, включающий и область)
+    // Пытаемся получить список разрешенных модулей, который устанавливается в Middleware.
+    // Предполагается, что ModuleAuthorizationMiddleware сохраняет список объектов с полями Controller и Area.
+    var allowedModules = Context.Items["AllowedControllers"] as IEnumerable<dynamic>
+                         ?? new List<dynamic> {
+                             new { Controller = "Home", Area = (string)null },
+                             new { Controller = "Account", Area = (string)null },
+                             new { Controller = "Market", Area = "BOX" },
+                             new { Controller = "Warehouse", Area = "CUBE" }
+                                 };
 }
 
-<!-- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,15 +67,16 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <!-- 1 ВАРИАНТ -->
-                        <!-- Проверяем, есть ли у пользователя доступ к модулю "Business" -->
-                        @if (userModules.Contains("Business"))
+                        <!-- Проверяем, есть ли у пользователя доступ к модулю "Business" по списку, полученному напрямую из БД -->
+                        @if (userModules.Any(m => string.Equals(m.Controller, "Business", System.StringComparison.OrdinalIgnoreCase)))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Business" asp-action="Index">Business</a>
                             </li>
                         }
+
                         <!-- Проверяем, есть ли у пользователя доступ к модулю "KPI" -->
-                        @if (userModules.Contains("KPI"))
+                        @if (userModules.Any(m => string.Equals(m.Controller, "KPI", System.StringComparison.OrdinalIgnoreCase)))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="KPI" asp-action="Index">KPI</a>
@@ -71,16 +85,21 @@
 
                         <!-- 2 ВАРИАНТ -->
                         <!-- Ссылки для области BOX -->
-                        @if (allowedControllers.Contains("Market"))
+                        @if (allowedModules.Any(m => string.Equals(m.Controller, "Market", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(m.Area, "BOX", System.StringComparison.OrdinalIgnoreCase)))
                         {
-                            <li class="nav-item">@Html.ActionLink("Market (BOX)", "Index", "Market", new { area = "BOX" }, new { @class = "nav-link" })</li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Market (BOX)", "Index", "Market", new { area = "BOX" }, new { @class = "nav-link" })
+                            </li>
                         }
                         <!-- Ссылки для области CUBE -->
-                        @if (allowedControllers.Contains("Warehouse"))
+                        @if (allowedModules.Any(m => string.Equals(m.Controller, "Warehouse", System.StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(m.Area, "CUBE", System.StringComparison.OrdinalIgnoreCase)))
                         {
-                            <li class="nav-item">@Html.ActionLink("Warehouse (CUBE)", "Index", "Warehouse", new { area = "CUBE" }, new { @class = "nav-link" })</li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Warehouse (CUBE)", "Index", "Warehouse", new { area = "CUBE" }, new { @class = "nav-link" })
+                            </li>
                         }
-
                     </ul>
 
                     <!-- Кнопка "Настроить доступ" видна только авторизованным пользователям -->
@@ -94,7 +113,7 @@
 
                     <!-- Правый блок навигации с кнопками входа/регистрации -->
                     <ul class="navbar-nav ms-auto">
-                        <partial name="_LoginPartial" /> <!-- Подключаем `_LoginPartial.cshtml` для отображения кнопок входа и выхода -->
+                        <partial name="_LoginPartial" /> <!-- Подключаем _LoginPartial.cshtml для отображения кнопок входа и выхода -->
                     </ul>
                 </div>
             </div>
@@ -117,5 +136,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
