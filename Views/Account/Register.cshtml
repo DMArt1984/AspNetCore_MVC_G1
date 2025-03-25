@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>Register</h2>
+<h2>Регистрация</h2>
 
 <form asp-action="Register" method="post">
     <div class="form-group">
@@ -32,7 +32,7 @@
     </div>
 
     <div class="form-group">
-        <label>Select Available Modules:</label><br />
+        <label>Выберите модули:</label><br />
         @if (Model.AvailableModules != null && Model.AvailableModules.Any())
         {
             foreach (var module in Model.AvailableModules)
@@ -60,5 +60,5 @@
         }
     </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
+    <button type="submit" class="btn btn-primary">Регистрация</button>
 </form>

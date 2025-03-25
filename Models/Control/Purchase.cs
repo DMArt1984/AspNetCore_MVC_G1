@@ -7,8 +7,7 @@ namespace AspNetCore_MVC_Project.Models.Control
     public class Purchase
     {
         /// <summary>
-        /// Уникальный идентификатор записи в таблице BuyModules
-        /// Автоматически генерируется базой данных
+        /// Уникальный идентификатор
         /// </summary>
         public int Id { get; set; }
 
@@ -30,7 +29,7 @@ namespace AspNetCore_MVC_Project.Models.Control
         public int OptionBlockId { get; set; }
 
         /// <summary>
-        /// Навигационное свойство для связи с `OptionBlock`
+        /// Навигационное свойство для связи с OptionBlock
         /// </summary>
         public virtual OptionBlock OptionBlock { get; set; }
     }
