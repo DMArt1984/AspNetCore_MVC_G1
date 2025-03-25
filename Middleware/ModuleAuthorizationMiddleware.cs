@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Data;
@@ -23,7 +22,7 @@ namespace AspNetCore_MVC_Project.Middleware
         }
 
         /// <summary>
-        /// Метод обработки HTTP-запроса. Проверяет, имеет ли текущий пользователь доступ к заданной паре Area/Controller.
+        /// Метод обработки HTTP-запроса. Проверяет, имеет ли текущий пользователь доступ к заданной паре Area/Controller
         /// </summary>
         /// <param name="context">Текущий HTTP-контекст</param>
         public async Task Invoke(HttpContext context)
@@ -39,8 +38,8 @@ namespace AspNetCore_MVC_Project.Middleware
             if (user != null && user.FactoryId.HasValue)
             {
                 // Получаем список разрешенных модулей для компании пользователя.
-                // Здесь для каждого элемента выбирается пара (Controller, Area) из связанной сущности OptionBlock.
-                // Если OptionBlock.NameArea хранит название области, то оно будет использоваться для проверки.
+                // Здесь для каждого элемента выбирается пара (Controller, Area) из связанной сущности OptionBlock
+                // Если OptionBlock.NameArea хранит название области, то оно будет использоваться для проверки
                 var allowedModules = await dbContext.Purchases
                     .Where(p => p.FactoryId == user.FactoryId)
                     .Select(p => new {
@@ -49,8 +48,8 @@ namespace AspNetCore_MVC_Project.Middleware
                     })
                     .ToListAsync();
 
-                // Добавляем стандартные контроллеры, доступ к которым разрешен вне зависимости от области.
-                // При этом Area оставляем null или пустой, чтобы проверка разрешала доступ независимо от области.
+                // Добавляем стандартные контроллеры, доступ к которым разрешен вне зависимости от области
+                // При этом Area оставляем null или пустой, чтобы проверка разрешала доступ независимо от области
                 allowedModules.Add(new { Controller = "Home", Area = (string)null });
                 allowedModules.Add(new { Controller = "Account", Area = (string)null });
                 allowedModules.Add(new { Controller = "Admin", Area = (string)null }); // временное решение для Admin
@@ -103,7 +102,7 @@ namespace AspNetCore_MVC_Project.Middleware
                         return false;
                     });
 
-                    // Если доступа к указанной паре (Area/Controller) нет, перенаправляем пользователя на главную страницу.
+                    // Если доступа к указанной паре (Area/Controller) нет, перенаправляем пользователя на главную страницу
                     if (!allowed)
                     {
                         context.Response.Redirect("/Home/Index");
