@@ -35,9 +35,10 @@
                          ?? new List<dynamic> {
                              new { Controller = "Home", Area = (string)null },
                              new { Controller = "Account", Area = (string)null },
-                             new { Controller = "Market", Area = "BOX" },
-                             new { Controller = "Warehouse", Area = "CUBE" }
+                             new { Controller = (string)null, Area = "BOX" },
+                             new { Controller = (string)null, Area = "CUBE" }
                                  };
+    var next = true;
 }
 
 <!DOCTYPE html>
@@ -85,7 +86,7 @@
 
                         <!-- 2 ВАРИАНТ -->
                         <!-- Ссылки для области BOX -->
-                        @if (allowedModules.Any(m => string.Equals(m.Controller, "Market", System.StringComparison.OrdinalIgnoreCase)
+                        @if (allowedModules.Any(m => (string.Equals(m.Controller, "Market", System.StringComparison.OrdinalIgnoreCase) || true)
                         && string.Equals(m.Area, "BOX", System.StringComparison.OrdinalIgnoreCase)))
                         {
                             <li class="nav-item">
@@ -93,7 +94,7 @@
                             </li>
                         }
                         <!-- Ссылки для области CUBE -->
-                        @if (allowedModules.Any(m => string.Equals(m.Controller, "Warehouse", System.StringComparison.OrdinalIgnoreCase)
+                        @if (allowedModules.Any(m => (string.Equals(m.Controller, "Warehouse", System.StringComparison.OrdinalIgnoreCase) || true)
                         && string.Equals(m.Area, "CUBE", System.StringComparison.OrdinalIgnoreCase)))
                         {
                             <li class="nav-item">
