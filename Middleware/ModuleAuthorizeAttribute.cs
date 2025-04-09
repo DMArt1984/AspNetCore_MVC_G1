@@ -10,7 +10,7 @@ using AspNetCore_MVC_Project.Models.Control;
 using System;
 using System.Threading.Tasks;
 
-namespace AspNetCore_MVC_Project
+namespace AspNetCore_MVC_Project.Middleware
 {
     /// <summary>
     /// Атрибут авторизации, ограничивающий доступ к контроллерам или действиям
