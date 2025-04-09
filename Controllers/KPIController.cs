@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AspNetCore_MVC_Project.Data;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore_MVC_Project.Models.Control;
+using AspNetCore_MVC_Project.Middleware;
 
 namespace AspNetCore_MVC_Project.Controllers
 {
